@@ -102,39 +102,29 @@ class AIService:
     def _build_feed_prompt(self, cow_data, language):
         if language == 'sw':
             return f"""
-            Wewe ni mtaalamu wa lishe ya ng'ombe wa maziwa. Toa mapendekezo ya chakula kwa ng'ombe:
+            Mshauri wa lishe. Toa mapendekezo mafupi kwa ng'ombe:
             
-            Jina: {cow_data['name']}
-            Aina: {cow_data['breed']}
-            Umri: {cow_data['age']} miezi
-            Uzito: {cow_data['weight']} kg
+            {cow_data['name']} - {cow_data['breed']} - {cow_data['age']} miezi
             
-            Toa mapendekezo katika muundo huu:
-            PROTINI: [kiasi]kg - [uchambuzi wa kina wa protini na thamani ya lishe]
-            MAJANI: [kiasi]kg - [sababu]
-            MADINI: [kiasi]kg - [sababu]
-            MAZIWA_YANAYOTARAJIWA: [kiasi]L/siku
-            UCHAMBUZI_WA_PROTINI: [uchambuzi wa kina wa protini, amino acid profile, na thamani ya lishe]
-            MAELEZO: [ushauri wa ziada]
+            Toa kwa muundo huu:
+            PROTINI: [kiasi]kg - [sababu fupi]
+            MAJANI: [kiasi]kg - [sababu fupi]
+            MADINI: [kiasi]kg - [sababu fupi]
+            MAZIWA: [kiasi]L/siku
+            SWALI: [swali la kufuatilia]
             """
         else:
             return f"""
-            You are a dairy cow nutrition expert. Provide detailed feed recommendations with protein analysis for this cow:
+            Feed advisor. Brief recommendations for cow:
             
-            Name: {cow_data['name']}
-            Breed: {cow_data['breed']}
-            Age: {cow_data['age']} months
-            Weight: {cow_data['weight']} kg
+            {cow_data['name']} - {cow_data['breed']} - {cow_data['age']} months
             
-            Provide recommendations in this exact format:
-            PROTEIN: [amount]kg - [detailed protein analysis with nutritional breakdown and amino acid content]
-            SILAGE: [amount]kg - [reason]
-            MINERALS: [amount]kg - [reason]
-            EXPECTED_MILK: [amount]L/day
-            PROTEIN_ANALYSIS: [detailed protein content analysis, amino acid profile, digestibility, and nutritional value for milk production]
-            NOTES: [additional advice]
-            
-            Make sure to include specific protein percentages, amino acid profiles, and how the protein content matches the cow's production needs.
+            Format:
+            PROTEIN: [amount]kg - [brief reason with % content]
+            SILAGE: [amount]kg - [brief reason]
+            MINERALS: [amount]kg - [brief reason]
+            MILK: [amount]L/day expected
+            QUESTION: [follow-up question]
             """
     
     def _build_prediction_prompt(self, cow_data, language):
@@ -162,17 +152,29 @@ class AIService:
     def _build_chat_prompt(self, message, language):
         if language == 'sw':
             return f"""
-            Wewe ni mshauri wa kilimo wa ng'ombe wa maziwa. Jibu swali hili kwa Kiswahili:
-            {message}
+            Wewe ni mshauri wa kilimo. Jibu kwa ufupi (2-3 sentensi tu).
             
-            Toa jibu la kina na la kifaa kuhusu ufugaji wa ng'ombe wa maziwa.
+            Swali: {message}
+            
+            Toa:
+            • Jibu fupi la moja kwa moja
+            • Hatua 1-2 za haraka
+            • Swali la kufuatilia
+            
+            Jibu kwa Kiswahili rahisi.
             """
         else:
             return f"""
-            You are a dairy farming advisor. Answer this question in English:
-            {message}
+            You are a dairy farming assistant. Answer in 2-3 sentences max.
             
-            Provide detailed and practical advice about dairy cow management.
+            Question: {message}
+            
+            Provide:
+            • Direct answer
+            • 1-2 quick action steps  
+            • Follow-up question
+            
+            Be brief and interactive.
             """
     
     def _parse_disease_response(self, response, language):
