@@ -1,0 +1,1142 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ cow.name }} - Smart Dairy{% endblock %}
+
+{% block content %}
+<div class="cow-detail-container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-cow"></i> Smart Dairy</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'cow_list' %}"><i class="fas fa-list"></i> My Cows</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Cow Profile Header -->
+        <div class="row">
+            <div class="col-12">
+                <div class="cow-profile-card fade-in-up">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1><i class="fas fa-cow me-2"></i>{{ cow.name }}</h1>
+                            <div class="cow-info">
+                                <span class="badge bg-primary me-2">{{ cow.breed }}</span>
+                                <span class="badge bg-secondary me-2">Tag: {{ cow.tag_number }}</span>
+                                <span class="badge bg-info">{{ cow.age }} months old</span>
+                            </div>
+                            <p class="mt-2 text-muted">Weight: {{ cow.weight }} kg | Added: {{ cow.date_added|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <img src="{% static 'images/cow 2.jpg' %}" alt="{{ cow.name }}" class="cow-avatar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Feed Analysis -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Weekly Feed & Milk Analysis - {{ cow.name }}</h4>
+                                <small>Current Week: {{ current_week_start|date:"M d" }} - {{ current_week_end|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="controls">
+                                {% if week_options %}
+                                <select class="form-select form-select-sm me-2" id="weekSelector" onchange="changeWeek()" style="width: auto; display: inline-block;">
+                                    {% for week in week_options %}
+                                    <option value="{{ week.start_date|date:'Y-m-d' }}" {% if week.is_current %}selected{% endif %}>
+                                        {{ week.label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <select class="form-select form-select-sm me-2" id="daySelector" style="width: auto; display: inline-block;">
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                                <button class="btn btn-sm btn-light" onclick="addManualEntry()">
+                                    <i class="fas fa-plus"></i> Add Entry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Weekly Data Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="weeklyTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Protein (kg)</th>
+                                        <th>Silage (kg)</th>
+                                        <th>Minerals (kg)</th>
+                                        <th>Milk Produced (L)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="weeklyTableBody">
+                                    {% for record in daily_feed_records %}
+                                    <tr {% if record.status == 'Pending' %}class="table-warning"{% elif record.status == 'Completed' %}class="table-success"{% endif %}>
+                                        <td><strong>{{ record.day_name }}</strong>
+                                            {% if record.status == 'Pending' %}<span class="badge bg-warning ms-2">Pending</span>{% endif %}
+                                        </td>
+                                        <td>{{ record.protein_feed }}</td>
+                                        <td>{{ record.silage }}</td>
+                                        <td>{{ record.minerals }}</td>
+                                        <td>
+                                            {% if record.milk_yield %}
+                                                {{ record.milk_yield }}
+                                            {% else %}
+                                                <input type="number" class="form-control form-control-sm" id="milk_{{ record.id }}"
+                                                       placeholder="Enter yield" style="width: 100px;" step="0.1">
+                                                <button class="btn btn-sm btn-success mt-1" onclick="saveMilk({{ record.id }})">
+                                                    <i class="fas fa-save"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if record.status == 'Pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif record.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-info">{{ record.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No feed records yet. Apply AI recommendations or add manual entries to start tracking.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                {% if daily_feed_records and averages %}
+                                <tfoot class="table-light">
+                                    <tr id="weeklyAverage">
+                                        <td><strong>Weekly Average</strong></td>
+                                        <td><strong>{{ averages.protein }}</strong></td>
+                                        <td><strong>{{ averages.silage }}</strong></td>
+                                        <td><strong>{{ averages.minerals }}</strong></td>
+                                        <td><strong>{{ averages.milk }}L</strong></td>
+                                        <td><span class="badge bg-primary">Calculated</span></td>
+                                    </tr>
+                                </tfoot>
+                                {% elif daily_feed_records %}
+                                <tfoot class="table-light">
+                                    <tr id="weeklyAverage">
+                                        <td><strong>Weekly Average</strong></td>
+                                        <td><strong>-</strong></td>
+                                        <td><strong>-</strong></td>
+                                        <td><strong>-</strong></td>
+                                        <td><strong>-</strong></td>
+                                        <td><span class="badge bg-secondary">No Data</span></td>
+                                    </tr>
+                                </tfoot>
+                                {% endif %}
+                            </table>
+                        </div>
+
+                        <!-- AI Recommendation for Tomorrow -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-primary">
+                                    <h5><i class="fas fa-robot me-2"></i>AI Recommendation for Tomorrow</h5>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Protein Feed:</strong><br>
+                                            <span class="fs-4 text-success">2.5 kg</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Silage:</strong><br>
+                                            <span class="fs-4 text-success">15 kg</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Minerals:</strong><br>
+                                            <span class="fs-4 text-success">0.3 kg</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Expected Milk:</strong><br>
+                                            <span class="fs-4 text-primary">{{ prediction.predicted_yield }}L</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <small><strong>AI Analysis:</strong> {{ prediction.ai_analysis }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="text-center">
+                            <button class="btn btn-success me-2" onclick="applyRecommendation()">
+                                <i class="fas fa-check me-1"></i>Apply Recommendation
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="generateNewPlan()">
+                                <i class="fas fa-sync me-1"></i>Generate New Plan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+            <div class="col-lg-6">
+                <div class="insights-card fade-in-right">
+                    <h4><i class="fas fa-lightbulb me-2 text-warning"></i>Health Insights</h4>
+                    <div class="insights-list">
+                        {% for insight in prediction.health_insights %}
+                        <div class="insight-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>{{ insight }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="action-buttons mt-3">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>Add Health Record
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-utensils me-1"></i>Log Feed Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cow-detail-container {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.cow-profile-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.cow-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #4CAF50;
+}
+
+.cow-info .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+.ai-prediction-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.prediction-header {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.confidence-score {
+    text-align: center;
+}
+
+.score-circle {
+    width: 80px;
+    height: 80px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+}
+
+.score-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.prediction-content {
+    padding: 2rem;
+    background: white;
+    color: #333;
+}
+
+.prediction-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 1.5rem;
+    height: 100%;
+    border-left: 4px solid #4CAF50;
+    transition: all 0.3s ease;
+}
+
+.prediction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.milk-prediction {
+    border-left-color: #2196F3;
+}
+
+.health-prediction {
+    border-left-color: #4CAF50;
+}
+
+.optimization-prediction {
+    border-left-color: #FF9800;
+}
+
+.prediction-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.milk-prediction .prediction-icon {
+    background: linear-gradient(135deg, #2196F3, #64B5F6);
+}
+
+.health-prediction .prediction-icon {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+}
+
+.optimization-prediction .prediction-icon {
+    background: linear-gradient(135deg, #FF9800, #FFB74D);
+}
+
+.prediction-details h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+.prediction-title {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.prediction-note {
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+.ai-explanation {
+    background: #f7fafc;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.ai-explanation h5 {
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.explanation-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+    padding-top: 0.25rem;
+}
+
+.step-content strong {
+    color: #2d3748;
+}
+
+.recommendations-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: #2d3748;
+}
+
+.recommendations-list {
+    padding: 1.5rem;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #4CAF50;
+}
+
+.feed-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.feed-details {
+    flex: 1;
+}
+
+.feed-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.feed-header strong {
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+.feed-quantity {
+    background: #4CAF50;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.feed-reason {
+    color: #718096;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.feed-timing {
+    color: #4a5568;
+    font-size: 0.8rem;
+}
+
+.total-nutrition {
+    background: #e6fffa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.total-nutrition h6 {
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+}
+
+.nutrition-summary {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.nutrition-item {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.prediction-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.confidence-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.prediction-metric {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.metric-content h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.metric-content p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.recommendations-card, .insights-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.recommendation-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #4CAF50;
+}
+
+.rec-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.quantity {
+    background: #4CAF50;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.rec-reason {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ai-story-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.story-step {
+    display: flex;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.step-content h6 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.step-content p {
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+}
+</style>
+
+<script>
+function refreshAIAnalysis() {
+    // Show loading state
+    const loadingSpinner = document.getElementById('aiLoadingSpinner');
+    const confidenceBadge = document.getElementById('confidenceBadge');
+    const aiContent = document.getElementById('aiContent');
+    
+    loadingSpinner.classList.remove('d-none');
+    confidenceBadge.classList.add('d-none');
+    aiContent.style.opacity = '0.5';
+    
+    // Simulate AI analysis with random data
+    setTimeout(() => {
+        const newYield = (Math.random() * 10 + 20).toFixed(1);
+        const newHealth = Math.floor(Math.random() * 20 + 80);
+        const newOptimization = (Math.random() * 10 + 5).toFixed(1);
+        const newConfidence = Math.floor(Math.random() * 15 + 85);
+        
+        document.getElementById('predictedYield').textContent = newYield + 'L';
+        document.getElementById('healthScore').textContent = newHealth + '%';
+        document.getElementById('optimizationPotential').textContent = '+' + newOptimization + '%';
+        confidenceBadge.textContent = newConfidence + '% Confidence';
+        
+        // Hide loading state
+        loadingSpinner.classList.add('d-none');
+        confidenceBadge.classList.remove('d-none');
+        aiContent.style.opacity = '1';
+    }, 2000); // 2 second loading simulation
+}
+
+function refreshFeedRecommendations() {
+    const feedSpinner = document.getElementById('feedLoadingSpinner');
+    const feedRecommendations = document.getElementById('feedRecommendations');
+    
+    feedSpinner.classList.remove('d-none');
+    feedRecommendations.style.opacity = '0.5';
+    
+    setTimeout(() => {
+        // Simulate new recommendations
+        const recommendations = [
+            { type: 'High-protein concentrate', quantity: (Math.random() * 2 + 2).toFixed(1), reason: 'Boost milk protein content' },
+            { type: 'Fresh grass silage', quantity: (Math.random() * 5 + 12).toFixed(1), reason: 'Optimal fiber for digestion' },
+            { type: 'Mineral supplement', quantity: (Math.random() * 0.2 + 0.2).toFixed(1), reason: 'Maintain calcium levels' }
+        ];
+        
+        feedRecommendations.innerHTML = recommendations.map(rec => `
+            <div class="recommendation-item">
+                <div class="rec-header">
+                    <strong>${rec.type}</strong>
+                    <span class="quantity">${rec.quantity} kg/day</span>
+                </div>
+                <p class="rec-reason">${rec.reason}</p>
+            </div>
+        `).join('');
+        
+        feedSpinner.classList.add('d-none');
+        feedRecommendations.style.opacity = '1';
+    }, 1500);
+}
+
+function applyRecommendation() {
+    // Call API to save recommendation to database
+    fetch(`/api/apply-recommendation/{{ cow.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.new_week) {
+                // Show message about new week and reload
+                showMessage(`New week started! AI recommendation applied for ${data.day}`, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                // Add new row to current table
+                const tableBody = document.getElementById('weeklyTableBody');
+                const newRow = document.createElement('tr');
+                newRow.className = 'table-warning';
+                
+                newRow.innerHTML = `
+                    <td><strong>${data.day}</strong> <span class="badge bg-warning">Pending</span></td>
+                    <td>${data.protein}</td>
+                    <td>${data.silage}</td>
+                    <td>${data.minerals}</td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" id="milk_${data.record_id}"
+                               placeholder="Enter yield" style="width: 100px;" step="0.1">
+                        <button class="btn btn-sm btn-success mt-1" onclick="saveMilk(${data.record_id})">
+                            <i class="fas fa-save"></i>
+                        </button>
+                    </td>
+                    <td><span class="badge bg-warning">Applied</span></td>
+                `;
+                
+                tableBody.appendChild(newRow);
+                
+                // Update button
+                event.target.innerHTML = '<i class="fas fa-check me-1"></i>Applied';
+                event.target.disabled = true;
+                event.target.className = 'btn btn-secondary me-2';
+                
+                showMessage(`AI recommendation applied for ${data.day}!`, 'success');
+            }
+        } else {
+            showMessage('Failed to apply recommendation', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error applying recommendation', 'error');
+    });
+}
+
+function changeWeek() {
+    const selector = document.getElementById('weekSelector');
+    const selectedWeek = selector.value;
+    
+    // Reload page with selected week
+    window.location.href = `?week=${selectedWeek}`;
+}
+
+function updateMilkYield(recordId) {
+    const milkInput = document.getElementById('milkInput');
+    const milkValue = milkInput.value;
+    
+    if (!milkValue || milkValue <= 0) {
+        showMessage('Please enter a valid milk yield', 'error');
+        return;
+    }
+    
+    // Call API to update milk yield in database
+    fetch(`/api/update-milk-yield/${recordId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'milk_yield': milkValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const pendingRow = document.getElementById('pending-row');
+            const dayName = pendingRow.querySelector('td').textContent.split(' ')[0];
+            
+            // Update the row
+            pendingRow.className = 'table-success';
+            pendingRow.innerHTML = `
+                <td><strong>${dayName}</strong></td>
+                <td>2.5</td>
+                <td>15</td>
+                <td>0.3</td>
+                <td>${milkValue}</td>
+                <td><span class="badge bg-success">Completed</span></td>
+            `;
+            
+            // Update weekly averages immediately if provided by server
+            if (data.averages) {
+                const avgRow = document.getElementById('weeklyAverage');
+                avgRow.cells[1].innerHTML = `<strong>${data.averages.protein}</strong>`;
+                avgRow.cells[2].innerHTML = `<strong>${data.averages.silage}</strong>`;
+                avgRow.cells[3].innerHTML = `<strong>${data.averages.minerals}</strong>`;
+                avgRow.cells[4].innerHTML = `<strong>${data.averages.milk}L</strong>`;
+            } else {
+                // Calculate from current table if server doesn't provide averages
+                calculateTableAverages();
+            }
+            
+            // Re-enable apply button for next day
+            const applyBtn = document.querySelector('.btn-secondary');
+            if (applyBtn) {
+                applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Recommendation';
+                applyBtn.disabled = false;
+                applyBtn.className = 'btn btn-success me-2';
+            }
+            
+            showMessage(`Milk yield updated: ${milkValue}L recorded for ${dayName}!`, 'success');
+        } else {
+            showMessage('Failed to update milk yield', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating milk yield', 'error');
+    });
+}
+
+function addManualEntry() {
+    const selectedDay = document.getElementById('daySelector').value;
+    
+    // Check if day already exists
+    const existingRows = document.querySelectorAll('#weeklyTableBody tr');
+    for (let row of existingRows) {
+        if (row.cells[0] && row.cells[0].textContent.includes(selectedDay)) {
+            showMessage(`${selectedDay} already exists in the table`, 'error');
+            return;
+        }
+    }
+    
+    // Create manual entry via API
+    fetch(`/api/add-manual-entry/{{ cow.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'day': selectedDay,
+            'protein': 2.0,
+            'silage': 12.0,
+            'minerals': 0.2
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Reload to show new entry
+        } else {
+            showMessage('Failed to add manual entry', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error adding manual entry', 'error');
+    });
+}
+
+function saveMilkYield(recordId) {
+    const inputElement = document.getElementById(`milkInput${recordId}`);
+    const milkValue = inputElement.value;
+    
+    if (!milkValue || milkValue <= 0) {
+        showMessage('Please enter a number greater than 0', 'error');
+        return;
+    }
+    
+    // Call API to update milk yield in database
+    fetch(`/api/update-milk-yield/${recordId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'milk_yield': milkValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Milk yield saved successfully!', 'success');
+            // Reload page to show updated data
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showMessage('Failed to update milk yield', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating milk yield', 'error');
+    });
+}
+
+function updateMilkYield(recordId, milkValue) {
+    // This function is kept for compatibility
+    saveMilkYield(recordId);
+}
+
+function updateWeeklyAverage() {
+    const tableBody = document.getElementById('weeklyTableBody');
+    const rows = tableBody.querySelectorAll('tr');
+    
+    let totalProtein = 0, totalSilage = 0, totalMinerals = 0, totalMilk = 0;
+    let count = 0;
+    
+    rows.forEach(row => {
+        const cells = row.cells;
+        if (cells.length >= 5) {
+            const protein = parseFloat(cells[1].textContent);
+            const silage = parseFloat(cells[2].textContent);
+            const minerals = parseFloat(cells[3].textContent);
+            const milk = parseFloat(cells[4].textContent);
+            
+            if (!isNaN(protein) && !isNaN(silage) && !isNaN(minerals) && !isNaN(milk)) {
+                totalProtein += protein;
+                totalSilage += silage;
+                totalMinerals += minerals;
+                totalMilk += milk;
+                count++;
+            }
+        }
+    });
+    
+    if (count > 0) {
+        const avgRow = document.getElementById('weeklyAverage');
+        avgRow.cells[1].innerHTML = `<strong>${(totalProtein / count).toFixed(2)}</strong>`;
+        avgRow.cells[2].innerHTML = `<strong>${(totalSilage / count).toFixed(1)}</strong>`;
+        avgRow.cells[3].innerHTML = `<strong>${(totalMinerals / count).toFixed(2)}</strong>`;
+        avgRow.cells[4].innerHTML = `<strong>${(totalMilk / count).toFixed(1)}L</strong>`;
+    }
+}
+
+function addWeekToHistory() {
+    // Store current week data (in a real app, this would go to database)
+    const currentWeek = getCurrentWeekData();
+    
+    // Add to localStorage for demo purposes
+    let weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
+    weekHistory.unshift(currentWeek);
+    
+    // Keep only last 10 weeks
+    if (weekHistory.length > 10) {
+        weekHistory = weekHistory.slice(0, 10);
+    }
+    
+    localStorage.setItem('weekHistory', JSON.stringify(weekHistory));
+}
+
+function getCurrentWeekData() {
+    const tableBody = document.getElementById('weeklyTableBody');
+    const rows = tableBody.querySelectorAll('tr');
+    const weekData = [];
+    
+    rows.forEach(row => {
+        const cells = row.cells;
+        if (cells.length >= 5) {
+            weekData.push({
+                day: cells[0].textContent.trim(),
+                protein: cells[1].textContent,
+                silage: cells[2].textContent,
+                minerals: cells[3].textContent,
+                milk: cells[4].textContent,
+                status: cells[5].textContent
+            });
+        }
+    });
+    
+    return {
+        date: new Date().toISOString().split('T')[0],
+        data: weekData
+    };
+}
+
+function updateWeekSelector() {
+    const selector = document.getElementById('weekSelector');
+    const weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
+    
+    // Clear existing options except current week
+    selector.innerHTML = '<option value="current">Current Week</option>';
+    
+    // Add historical weeks
+    weekHistory.forEach((week, index) => {
+        const option = document.createElement('option');
+        option.value = `week${index}`;
+        option.textContent = `Week ${index + 1} (${new Date(week.date).toLocaleDateString()})`;
+        selector.appendChild(option);
+    });
+}
+
+function changeWeek() {
+    const selector = document.getElementById('weekSelector');
+    const selectedWeek = selector.value;
+    
+    if (selectedWeek === 'current') {
+        // Show current week (reload page or reset to current data)
+        location.reload();
+    } else {
+        // Load historical week
+        const weekIndex = parseInt(selectedWeek.replace('week', ''));
+        const weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
+        
+        if (weekHistory[weekIndex]) {
+            loadHistoricalWeek(weekHistory[weekIndex]);
+        }
+    }
+}
+
+function loadHistoricalWeek(weekData) {
+    const tableBody = document.getElementById('weeklyTableBody');
+    tableBody.innerHTML = '';
+    
+    weekData.data.forEach(dayData => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${dayData.day}</strong></td>
+            <td>${dayData.protein}</td>
+            <td>${dayData.silage}</td>
+            <td>${dayData.minerals}</td>
+            <td>${dayData.milk}</td>
+            <td>${dayData.status}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+    
+    // Disable apply button for historical weeks
+    const applyBtn = document.querySelector('.btn-success, .btn-secondary');
+    if (applyBtn) {
+        applyBtn.style.display = 'none';
+    }
+    
+    showMessage('Historical week loaded', 'info');
+}
+
+function generateNewPlan() {
+    // Simulate generating new recommendations
+    const recommendations = [
+        { protein: 2.3, silage: 14, minerals: 0.25, expectedMilk: 24.8 },
+        { protein: 2.7, silage: 16, minerals: 0.35, expectedMilk: 26.2 },
+        { protein: 2.4, silage: 13, minerals: 0.3, expectedMilk: 25.1 }
+    ];
+    
+    const randomPlan = recommendations[Math.floor(Math.random() * recommendations.length)];
+    
+    // Update recommendation display
+    const recDiv = document.querySelector('.alert-primary .row');
+    recDiv.innerHTML = `
+        <div class="col-md-3">
+            <strong>Protein Feed:</strong><br>
+            <span class="fs-4 text-success">${randomPlan.protein} kg</span>
+        </div>
+        <div class="col-md-3">
+            <strong>Silage:</strong><br>
+            <span class="fs-4 text-success">${randomPlan.silage} kg</span>
+        </div>
+        <div class="col-md-3">
+            <strong>Minerals:</strong><br>
+            <span class="fs-4 text-success">${randomPlan.minerals} kg</span>
+        </div>
+        <div class="col-md-3">
+            <strong>Expected Milk:</strong><br>
+            <span class="fs-4 text-primary">${randomPlan.expectedMilk}L</span>
+        </div>
+    `;
+    
+    // Re-enable apply button
+    const applyBtn = document.querySelector('.btn-success, .btn-secondary');
+    applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Recommendation';
+    applyBtn.disabled = false;
+    applyBtn.className = 'btn btn-success me-2';
+    
+    showMessage('New AI plan generated!', 'info');
+}
+
+function showMessage(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : 
+                     type === 'error' ? 'alert-danger' : 'alert-info';
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 3000);
+}
+
+function saveMilk(recordId) {
+    const input = document.getElementById('milk_' + recordId);
+    const value = input.value;
+    
+    if (!value || value <= 0) {
+        alert('Please enter a valid number');
+        return;
+    }
+    
+    fetch(`/api/update-milk-yield/${recordId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'milk_yield': value})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error saving');
+        }
+    });
+}
+</script>
+{% endblock %}

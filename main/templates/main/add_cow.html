@@ -1,0 +1,195 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Add Cow - Smart Dairy{% endblock %}
+
+{% block content %}
+<div class="add-cow-container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-cow"></i> Smart Dairy</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'cow_list' %}"><i class="fas fa-list"></i> My Cows</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="add-cow-card fade-in-up">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-plus-circle text-success" style="font-size: 3rem;"></i>
+                        <h2>Add New Cow to Your Herd</h2>
+                        <p class="text-muted">Enter your cow's details to start AI-powered tracking</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Cow Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                                <div class="invalid-feedback">Please provide a cow name.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tag_number" class="form-label">Tag Number</label>
+                                <input type="text" class="form-control" id="tag_number" name="tag_number" required>
+                                <div class="invalid-feedback">Please provide a unique tag number.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="breed" class="form-label">Breed</label>
+                                <select class="form-control" id="breed" name="breed" required>
+                                    <option value="">Select Breed</option>
+                                    <option value="Holstein">Holstein</option>
+                                    <option value="Jersey">Jersey</option>
+                                    <option value="Guernsey">Guernsey</option>
+                                    <option value="Ayrshire">Ayrshire</option>
+                                    <option value="Brown Swiss">Brown Swiss</option>
+                                    <option value="Friesian">Friesian</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a breed.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="age" class="form-label">Age (months)</label>
+                                <input type="number" class="form-control" id="age" name="age" min="1" max="300" required>
+                                <div class="invalid-feedback">Please provide age in months.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" name="weight" min="50" max="1000" step="0.1" required>
+                            <div class="invalid-feedback">Please provide weight in kilograms.</div>
+                        </div>
+
+                        <div class="ai-info-card mb-4">
+                            <h5><i class="fas fa-brain text-primary me-2"></i>AI Features Enabled</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <i class="fas fa-chart-line text-success"></i>
+                                        <span>Production Prediction</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <i class="fas fa-utensils text-warning"></i>
+                                        <span>Feed Optimization</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <i class="fas fa-heartbeat text-danger"></i>
+                                        <span>Health Monitoring</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-lg me-3">
+                                <i class="fas fa-plus me-2"></i>Add Cow to Herd
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.add-cow-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.add-cow-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.ai-info-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.feature-item i {
+    margin-right: 0.5rem;
+    width: 20px;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #45a049, #66bb6a);
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

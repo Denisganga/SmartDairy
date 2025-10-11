@@ -1,0 +1,514 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Disease Detection - Smart Dairy{% endblock %}
+
+{% block content %}
+<div class="disease-detection-container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-cow"></i> Smart Dairy</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'chatbot' %}"><i class="fas fa-robot"></i> AI Chat</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="detection-card">
+                    <div class="detection-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3><i class="fas fa-camera-retro me-2"></i>AI Disease Detection</h3>
+                                <p class="mb-0 text-muted">Powered by Advanced AI Vision</p>
+                            </div>
+                            <div class="language-selector">
+                                <select id="languageSelect" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="sw">Kiswahili</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detection-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="upload-section">
+                                    <h5 id="uploadTitle">Upload Cow Photo</h5>
+                                    <p id="uploadSubtitle" class="text-muted">Take or upload a photo of your cow to detect diseases and get treatment recommendations</p>
+                                    
+                                    <div class="upload-area" id="uploadArea">
+                                        <div class="upload-content">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <h6 id="uploadText">Click to upload or drag and drop</h6>
+                                            <p id="uploadHint">JPG, PNG or JPEG (Max 10MB)</p>
+                                        </div>
+                                        <input type="file" id="imageInput" accept="image/*" capture="camera">
+                                    </div>
+
+                                    <div class="image-preview d-none" id="imagePreview">
+                                        <img id="previewImg" src="" alt="Preview">
+                                        <button class="btn btn-sm btn-danger remove-image" id="removeImage">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
+                                    <button class="btn btn-primary btn-lg w-100 mt-3" id="analyzeBtn" disabled>
+                                        <i class="fas fa-search me-2"></i>
+                                        <span id="analyzeBtnText">Analyze with AI</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="results-section">
+                                    <div class="loading-state d-none" id="loadingState">
+                                        <div class="text-center">
+                                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                                            <h5 id="loadingText">Analyzing image with AI...</h5>
+                                            <p id="loadingSubtext" class="text-muted">This may take a few seconds</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="empty-state" id="emptyState">
+                                        <div class="text-center">
+                                            <i class="fas fa-stethoscope text-muted" style="font-size: 4rem;"></i>
+                                            <h5 id="emptyTitle" class="mt-3">AI Analysis Results</h5>
+                                            <p id="emptySubtitle" class="text-muted">Upload a photo to get started with disease detection</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="analysis-results d-none" id="analysisResults">
+                                        <div class="result-header">
+                                            <h5><i class="fas fa-microscope me-2"></i><span id="resultTitle">Analysis Complete</span></h5>
+                                        </div>
+
+                                        <div class="disease-info">
+                                            <div class="info-card mb-3">
+                                                <h6><i class="fas fa-bug text-danger me-2"></i><span id="diseaseLabel">Disease Detected</span></h6>
+                                                <p id="diseaseName" class="fw-bold text-danger">-</p>
+                                            </div>
+
+                                            <div class="info-card mb-3">
+                                                <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i><span id="urgencyLabel">Urgency Level</span></h6>
+                                                <span id="urgencyLevel" class="badge bg-warning">-</span>
+                                            </div>
+
+                                            <div class="info-card mb-3">
+                                                <h6><i class="fas fa-list-ul text-info me-2"></i><span id="symptomsLabel">Symptoms</span></h6>
+                                                <p id="symptoms" class="text-muted">-</p>
+                                            </div>
+
+                                            <div class="info-card mb-3">
+                                                <h6><i class="fas fa-pills text-success me-2"></i><span id="treatmentLabel">Treatment</span></h6>
+                                                <p id="treatment" class="text-success">-</p>
+                                            </div>
+
+                                            <div class="info-card">
+                                                <h6><i class="fas fa-shield-alt text-primary me-2"></i><span id="preventionLabel">Prevention</span></h6>
+                                                <p id="prevention" class="text-primary">-</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="action-buttons mt-4">
+                                            <button class="btn btn-outline-primary" id="newAnalysisBtn">
+                                                <i class="fas fa-camera me-2"></i><span id="newAnalysisText">New Analysis</span>
+                                            </button>
+                                            <button class="btn btn-success" id="saveResultBtn">
+                                                <i class="fas fa-save me-2"></i><span id="saveResultText">Save Result</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.disease-detection-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.detection-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.detection-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+}
+
+.language-selector select {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 8px;
+}
+
+.detection-body {
+    padding: 2rem;
+}
+
+.upload-area {
+    border: 3px dashed #ddd;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: #4CAF50;
+    background: #f8fff8;
+}
+
+.upload-area.dragover {
+    border-color: #4CAF50;
+    background: #f0fff0;
+}
+
+.upload-content i {
+    font-size: 3rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.upload-area input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.image-preview {
+    position: relative;
+    margin-top: 1rem;
+}
+
+.image-preview img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.remove-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.results-section {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 2rem;
+    min-height: 500px;
+}
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+}
+
+.info-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 4px solid #4CAF50;
+}
+
+.info-card h6 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-buttons .btn {
+    flex: 1;
+}
+</style>
+
+<script>
+let currentLanguage = 'en';
+let selectedFile = null;
+
+const translations = {
+    en: {
+        uploadTitle: "Upload Cow Photo",
+        uploadSubtitle: "Take or upload a photo of your cow to detect diseases and get treatment recommendations",
+        uploadText: "Click to upload or drag and drop",
+        uploadHint: "JPG, PNG or JPEG (Max 10MB)",
+        analyzeBtnText: "Analyze with AI",
+        loadingText: "Analyzing image with AI...",
+        loadingSubtext: "This may take a few seconds",
+        emptyTitle: "AI Analysis Results",
+        emptySubtitle: "Upload a photo to get started with disease detection",
+        resultTitle: "Analysis Complete",
+        diseaseLabel: "Disease Status",
+        urgencyLabel: "Urgency Level",
+        symptomsLabel: "Symptoms",
+        treatmentLabel: "Treatment",
+        preventionLabel: "Prevention",
+        newAnalysisText: "New Analysis",
+        saveResultText: "Save Result"
+    },
+    sw: {
+        uploadTitle: "Pakia Picha ya Ng'ombe",
+        uploadSubtitle: "Piga au pakia picha ya ng'ombe wako ili kutambua magonjwa na kupata mapendekezo ya matibabu",
+        uploadText: "Bofya kupakia au buruta na udondoshe",
+        uploadHint: "JPG, PNG au JPEG (Juu ya 10MB)",
+        analyzeBtnText: "Chunguza na AI",
+        loadingText: "Inachunguza picha na AI...",
+        loadingSubtext: "Hii inaweza kuchukua sekunde chache",
+        emptyTitle: "Matokeo ya Uchambuzi wa AI",
+        emptySubtitle: "Pakia picha ili kuanza na utambuzi wa magonjwa",
+        resultTitle: "Uchambuzi Umekamilika",
+        diseaseLabel: "Hali ya Ugonjwa",
+        urgencyLabel: "Kiwango cha Haraka",
+        symptomsLabel: "Dalili",
+        treatmentLabel: "Matibabu",
+        preventionLabel: "Kuzuia",
+        newAnalysisText: "Uchambuzi Mpya",
+        saveResultText: "Hifadhi Matokeo"
+    }
+};
+
+// Language selector
+document.getElementById('languageSelect').addEventListener('change', function() {
+    currentLanguage = this.value;
+    updateLanguage();
+});
+
+function updateLanguage() {
+    const t = translations[currentLanguage];
+    
+    document.getElementById('uploadTitle').textContent = t.uploadTitle;
+    document.getElementById('uploadSubtitle').textContent = t.uploadSubtitle;
+    document.getElementById('uploadText').textContent = t.uploadText;
+    document.getElementById('uploadHint').textContent = t.uploadHint;
+    document.getElementById('analyzeBtnText').textContent = t.analyzeBtnText;
+    document.getElementById('loadingText').textContent = t.loadingText;
+    document.getElementById('loadingSubtext').textContent = t.loadingSubtext;
+    document.getElementById('emptyTitle').textContent = t.emptyTitle;
+    document.getElementById('emptySubtitle').textContent = t.emptySubtitle;
+    document.getElementById('resultTitle').textContent = t.resultTitle;
+    document.getElementById('diseaseLabel').textContent = t.diseaseLabel;
+    document.getElementById('urgencyLabel').textContent = t.urgencyLabel;
+    document.getElementById('symptomsLabel').textContent = t.symptomsLabel;
+    document.getElementById('treatmentLabel').textContent = t.treatmentLabel;
+    document.getElementById('preventionLabel').textContent = t.preventionLabel;
+    document.getElementById('newAnalysisText').textContent = t.newAnalysisText;
+    document.getElementById('saveResultText').textContent = t.saveResultText;
+}
+
+// File upload handling
+const uploadArea = document.getElementById('uploadArea');
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewImg = document.getElementById('previewImg');
+const analyzeBtn = document.getElementById('analyzeBtn');
+
+uploadArea.addEventListener('click', () => imageInput.click());
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileSelect(files[0]);
+    }
+});
+
+imageInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+    }
+});
+
+function handleFileSelect(file) {
+    if (file && file.type.startsWith('image/')) {
+        selectedFile = file;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            uploadArea.style.display = 'none';
+            imagePreview.classList.remove('d-none');
+            analyzeBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+document.getElementById('removeImage').addEventListener('click', () => {
+    selectedFile = null;
+    uploadArea.style.display = 'block';
+    imagePreview.classList.add('d-none');
+    analyzeBtn.disabled = true;
+    imageInput.value = '';
+});
+
+// Analysis
+analyzeBtn.addEventListener('click', analyzeImage);
+
+function analyzeImage() {
+    if (!selectedFile) return;
+    
+    showLoading();
+    
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+    formData.append('language', currentLanguage);
+    
+    fetch('{% url "analyze_disease_api" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            showResults(data.analysis);
+        } else {
+            alert('Error analyzing image');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        alert('Error: ' + error.message);
+    });
+}
+
+function showLoading() {
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('analysisResults').classList.add('d-none');
+    document.getElementById('loadingState').classList.remove('d-none');
+}
+
+function hideLoading() {
+    document.getElementById('loadingState').classList.add('d-none');
+}
+
+function showResults(analysis) {
+    // Check if it's not a cow
+    if (analysis.is_cow === false) {
+        document.getElementById('diseaseName').textContent = analysis.disease_name;
+        document.getElementById('urgencyLevel').textContent = analysis.urgency;
+        document.getElementById('symptoms').innerHTML = formatAnalysisText(analysis.symptoms);
+        document.getElementById('treatment').innerHTML = formatAnalysisText(analysis.treatment);
+        document.getElementById('prevention').innerHTML = formatAnalysisText(analysis.prevention);
+        
+        // Set special styling for non-cow images
+        const urgencyBadge = document.getElementById('urgencyLevel');
+        urgencyBadge.className = 'badge bg-secondary';
+        
+        // Change the disease label to indicate it's not a cow
+        const diseaseLabel = document.getElementById('diseaseLabel');
+        if (currentLanguage === 'sw') {
+            diseaseLabel.textContent = 'Aina ya Picha';
+        } else {
+            diseaseLabel.textContent = 'Image Type';
+        }
+        
+        document.getElementById('analysisResults').classList.remove('d-none');
+        return;
+    }
+    
+    // Reset disease label for cow images
+    const diseaseLabel = document.getElementById('diseaseLabel');
+    if (currentLanguage === 'sw') {
+        diseaseLabel.textContent = 'Ugonjwa Umetambuliwa';
+    } else {
+        diseaseLabel.textContent = 'Disease Status';
+    }
+    
+    document.getElementById('diseaseName').textContent = analysis.disease_name;
+    document.getElementById('urgencyLevel').textContent = analysis.urgency;
+    
+    // Format symptoms and other text fields
+    document.getElementById('symptoms').innerHTML = formatAnalysisText(analysis.symptoms);
+    document.getElementById('treatment').innerHTML = formatAnalysisText(analysis.treatment);
+    document.getElementById('prevention').innerHTML = formatAnalysisText(analysis.prevention);
+    
+    // Set urgency badge color - handle both English and Swahili
+    const urgencyBadge = document.getElementById('urgencyLevel');
+    const urgency = analysis.urgency.toLowerCase();
+    
+    if (urgency === 'none' || urgency === 'hakuna') {
+        urgencyBadge.className = 'badge bg-success';
+    } else if (urgency === 'high' || urgency === 'juu' || urgency === 'critical' || urgency === 'muhimu') {
+        urgencyBadge.className = 'badge bg-danger';
+    } else if (urgency === 'medium' || urgency === 'wastani' || urgency === 'moderate') {
+        urgencyBadge.className = 'badge bg-warning';
+    } else {
+        urgencyBadge.className = 'badge bg-info';
+    }
+    
+    document.getElementById('analysisResults').classList.remove('d-none');
+}
+
+function formatAnalysisText(text) {
+    // Clean and format text
+    const cleaned = text.replace(/\*+/g, '').trim();
+    const paragraphs = cleaned.split('\n').filter(p => p.trim());
+    
+    if (paragraphs.length > 1) {
+        return paragraphs.map(p => `<p class="mb-1">${p.trim()}</p>`).join('');
+    }
+    return cleaned;
+}
+
+document.getElementById('newAnalysisBtn').addEventListener('click', () => {
+    document.getElementById('removeImage').click();
+    document.getElementById('analysisResults').classList.add('d-none');
+    document.getElementById('emptyState').style.display = 'flex';
+});
+</script>
+{% endblock %}

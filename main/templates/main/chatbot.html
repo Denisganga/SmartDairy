@@ -1,0 +1,428 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}AI Chatbot - Smart Dairy{% endblock %}
+
+{% block content %}
+<div class="chatbot-container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-cow"></i> Smart Dairy</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'cow_list' %}"><i class="fas fa-list"></i> My Cows</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="chat-container">
+        <div class="chat-card">
+            <div class="chat-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-robot me-2"></i>Smart Dairy AI Assistant</h4>
+                        <p class="mb-0 text-muted">Powered by Advanced AI</p>
+                    </div>
+                    <div class="language-selector">
+                        <select id="languageSelect" class="form-select">
+                            <option value="en">English</option>
+                            <option value="sw">Kiswahili</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p id="welcomeMessage">Hello! I'm your Smart Dairy AI assistant. Ask me anything about dairy farming, cow health, feed management, or milk production!</p>
+                        <small class="message-time">Just now</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="quick-questions mb-3">
+                    <h6 id="quickQuestionsTitle">Quick Questions:</h6>
+                    <div class="quick-question-buttons">
+                        <button class="btn btn-outline-primary btn-sm quick-btn" data-en="How to increase milk production?" data-sw="Jinsi ya kuongeza uzalishaji wa maziwa?">
+                            <span class="en-text">How to increase milk production?</span>
+                            <span class="sw-text d-none">Jinsi ya kuongeza uzalishaji wa maziwa?</span>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm quick-btn" data-en="What feed is best for Holstein cows?" data-sw="Chakula gani ni bora kwa ng'ombe wa Holstein?">
+                            <span class="en-text">What feed is best for Holstein cows?</span>
+                            <span class="sw-text d-none">Chakula gani ni bora kwa ng'ombe wa Holstein?</span>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm quick-btn" data-en="Signs of cow illness?" data-sw="Dalili za ugonjwa wa ng'ombe?">
+                            <span class="en-text">Signs of cow illness?</span>
+                            <span class="sw-text d-none">Dalili za ugonjwa wa ng'ombe?</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
+                    <button class="btn btn-primary" type="button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chatbot-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.chat-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.language-selector select {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 8px;
+}
+
+.language-selector select option {
+    background: #333;
+    color: white;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: 50vh;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.3s ease;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.bot-message .message-avatar {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: white;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.user-message .message-avatar {
+    background: linear-gradient(135deg, #2196F3, #64B5F6);
+    color: white;
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+.message-content {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 15px;
+    max-width: 70%;
+    position: relative;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #2196F3, #64B5F6);
+    color: white;
+}
+
+.message-content p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.message-time {
+    opacity: 0.7;
+    font-size: 0.8rem;
+}
+
+.chat-input-container {
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.quick-questions h6 {
+    color: #666;
+    margin-bottom: 0.75rem;
+}
+
+.quick-question-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.quick-btn {
+    border-radius: 20px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.quick-btn:hover {
+    transform: translateY(-2px);
+}
+
+.input-group .form-control {
+    border-radius: 25px 0 0 25px;
+    border: 2px solid #e9ecef;
+    padding: 12px 20px;
+}
+
+.input-group .btn {
+    border-radius: 0 25px 25px 0;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    border: none;
+}
+
+.typing-indicator {
+    display: none;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4CAF50;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script>
+let currentLanguage = 'en';
+
+const translations = {
+    en: {
+        welcomeMessage: "Hello! I'm your Smart Dairy AI assistant. Ask me anything about dairy farming, cow health, feed management, or milk production!",
+        quickQuestionsTitle: "Quick Questions:",
+        placeholder: "Type your message...",
+        typing: "AI is typing..."
+    },
+    sw: {
+        welcomeMessage: "Hujambo! Mimi ni msaidizi wako wa Smart Dairy AI. Niulize chochote kuhusu ufugaji wa ng'ombe wa maziwa, afya ya ng'ombe, usimamizi wa chakula, au uzalishaji wa maziwa!",
+        quickQuestionsTitle: "Maswali ya Haraka:",
+        placeholder: "Andika ujumbe wako...",
+        typing: "AI inaandika..."
+    }
+};
+
+document.getElementById('languageSelect').addEventListener('change', function() {
+    currentLanguage = this.value;
+    updateLanguage();
+});
+
+function updateLanguage() {
+    // Update welcome message
+    document.getElementById('welcomeMessage').textContent = translations[currentLanguage].welcomeMessage;
+    
+    // Update quick questions title
+    document.getElementById('quickQuestionsTitle').textContent = translations[currentLanguage].quickQuestionsTitle;
+    
+    // Update placeholder
+    document.getElementById('messageInput').placeholder = translations[currentLanguage].placeholder;
+    
+    // Update quick question buttons
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+        const enText = btn.querySelector('.en-text');
+        const swText = btn.querySelector('.sw-text');
+        
+        if (currentLanguage === 'sw') {
+            enText.classList.add('d-none');
+            swText.classList.remove('d-none');
+        } else {
+            enText.classList.remove('d-none');
+            swText.classList.add('d-none');
+        }
+    });
+}
+
+// Quick question buttons
+document.querySelectorAll('.quick-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const message = this.getAttribute(`data-${currentLanguage}`);
+        sendMessage(message);
+    });
+});
+
+// Send message function
+document.getElementById('sendButton').addEventListener('click', function() {
+    const message = document.getElementById('messageInput').value.trim();
+    if (message) {
+        sendMessage(message);
+    }
+});
+
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const message = this.value.trim();
+        if (message) {
+            sendMessage(message);
+        }
+    }
+});
+
+function sendMessage(message) {
+    // Add user message to chat
+    addMessage(message, 'user');
+    
+    // Clear input
+    document.getElementById('messageInput').value = '';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Send to API
+    fetch('{% url "chat_api" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            message: message,
+            language: currentLanguage
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideTypingIndicator();
+        addMessage(data.response, 'bot');
+    })
+    .catch(error => {
+        hideTypingIndicator();
+        const errorMsg = currentLanguage === 'sw' ? 
+            'Samahani, kuna tatizo. Jaribu tena.' : 
+            'Sorry, there was an error. Please try again.';
+        addMessage(errorMsg, 'bot');
+    });
+}
+
+function addMessage(text, sender) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const avatarIcon = sender === 'bot' ? 'fas fa-robot' : 'fas fa-user';
+    
+    // Format the text properly
+    const formattedText = formatMessageText(text);
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="${avatarIcon}"></i>
+        </div>
+        <div class="message-content">
+            <div>${formattedText}</div>
+            <small class="message-time">Just now</small>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function formatMessageText(text) {
+    // Split text into paragraphs and format
+    const paragraphs = text.split('\n\n').filter(p => p.trim());
+    
+    return paragraphs.map(paragraph => {
+        // Clean up any remaining asterisks
+        const cleaned = paragraph.replace(/\*+/g, '').trim();
+        return `<p class="mb-2">${cleaned}</p>`;
+    }).join('');
+}
+
+function showTypingIndicator() {
+    const messagesContainer = document.getElementById('chatMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing-indicator';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-content">
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    `;
+    typingDiv.style.display = 'flex';
+    
+    messagesContainer.appendChild(typingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+</script>
+{% endblock %}

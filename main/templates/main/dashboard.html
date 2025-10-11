@@ -1,0 +1,1033 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Smart Dairy{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark dashboard-nav">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <div class="brand-container">
+                    <i class="fas fa-cow brand-logo"></i>
+                    <span class="brand-text">Smart Dairy Dashboard</span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboardNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="dashboardNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link nav-item" href="{% url 'cow_list' %}">
+                        <i class="fas fa-list nav-icon"></i>
+                        <span class="nav-text">My Cows</span>
+                    </a>
+                    <a class="nav-link nav-item" href="{% url 'add_cow' %}">
+                        <i class="fas fa-plus nav-icon"></i>
+                        <span class="nav-text">Add Cow</span>
+                    </a>
+                    <a class="nav-link nav-item" href="{% url 'disease_detection' %}">
+                        <i class="fas fa-camera nav-icon"></i>
+                        <span class="nav-text">Disease Detection</span>
+                    </a>
+                    <a class="nav-link nav-item" href="{% url 'chatbot' %}">
+                        <i class="fas fa-robot nav-icon"></i>
+                        <span class="nav-text">AI Chat</span>
+                    </a>
+                    <div class="nav-divider"></div>
+                    <span class="navbar-text user-welcome">
+                        <i class="fas fa-user-circle me-2"></i>Welcome, {{ user.username }}!
+                    </span>
+                    <a class="nav-link nav-item logout-btn" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt nav-icon"></i>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Welcome Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="welcome-card fade-in-up">
+                    <div class="welcome-background"></div>
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="welcome-content">
+                                <h1 class="welcome-title">Welcome to Your Smart Dairy Dashboard</h1>
+                                <p class="welcome-subtitle">Your AI-powered dairy management platform. Track your herd and get intelligent insights to maximize productivity and animal welfare.</p>
+                                <div class="action-buttons mt-4">
+                                    <a href="{% url 'add_cow' %}" class="btn btn-primary me-3">
+                                        <i class="fas fa-plus btn-icon"></i>
+                                        <span>Add New Cow</span>
+                                        <div class="btn-shine"></div>
+                                    </a>
+                                    <a href="{% url 'disease_detection' %}" class="btn btn-warning me-3">
+                                        <i class="fas fa-camera btn-icon"></i>
+                                        <span>Disease Detection</span>
+                                    </a>
+                                    <a href="{% url 'cow_list' %}" class="btn btn-outline-primary me-3">
+                                        <i class="fas fa-list btn-icon"></i>
+                                        <span>View All Cows</span>
+                                    </a>
+                                    <a href="{% url 'chatbot' %}" class="btn btn-success">
+                                        <i class="fas fa-robot btn-icon"></i>
+                                        <span>AI Assistant</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="welcome-image-container">
+                                <img src="{% static 'images/cow 2.jpg' %}" alt="Cow" class="welcome-image">
+                                <div class="image-glow"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="row mt-4">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card fade-in-up" data-delay="100">
+                    <div class="stat-glow"></div>
+                    <div class="stat-icon stat-primary">
+                        <i class="fas fa-cow"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">{{ total_cows }}</h3>
+                        <p class="stat-label">Total Cows</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up trend-up"></i>
+                            <span>Growing herd</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card fade-in-up" data-delay="200">
+                    <div class="stat-glow"></div>
+                    <div class="stat-icon stat-success">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">{{ today_production }}L</h3>
+                        <p class="stat-label">Today's Production</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-chart-line trend-neutral"></i>
+                            <span>Daily average</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card fade-in-up" data-delay="300">
+                    <div class="stat-glow"></div>
+                    <div class="stat-icon stat-warning">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">{{ health_alerts }}</h3>
+                        <p class="stat-label">Health Alerts</p>
+                        <div class="stat-trend">
+                            {% if health_alerts > 0 %}
+                            <i class="fas fa-exclamation-triangle trend-alert"></i>
+                            <span>Needs attention</span>
+                            {% else %}
+                            <i class="fas fa-check-circle trend-ok"></i>
+                            <span>All clear</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card fade-in-up" data-delay="400">
+                    <div class="stat-glow"></div>
+                    <div class="stat-icon stat-info">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">{{ ai_recommendations }}</h3>
+                        <p class="stat-label">AI Recommendations</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-lightbulb trend-idea"></i>
+                            <span>Smart insights</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Cows Section -->
+        {% if recent_cows %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="header-content">
+                            <i class="fas fa-cow header-icon"></i>
+                            <h5 class="header-title">Recent Cows</h5>
+                        </div>
+                        <a href="{% url 'cow_list' %}" class="view-all-btn">
+                            View All <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            {% for cow in recent_cows %}
+                            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                                <div class="cow-card fade-in-up" data-delay="{% widthratio forloop.counter 1 100 %}">
+                                    <div class="cow-card-header">
+                                        <div class="cow-avatar">
+                                            <i class="fas fa-cow"></i>
+                                        </div>
+                                        <div class="cow-status status-healthy"></div>
+                                    </div>
+                                    <div class="cow-card-body">
+                                        <h6 class="cow-name">{{ cow.name }}</h6>
+                                        <div class="cow-details">
+                                            <div class="detail-item">
+                                                <i class="fas fa-tag detail-icon"></i>
+                                                <span class="detail-text">Tag: {{ cow.tag_number }}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="fas fa-paw detail-icon"></i>
+                                                <span class="detail-text">Breed: {{ cow.breed }}</span>
+                                            </div>
+                                            {% if cow.age %}
+                                            <div class="detail-item">
+                                                <i class="fas fa-birthday-cake detail-icon"></i>
+                                                <span class="detail-text">Age: {{ cow.age }} years</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="cow-card-footer">
+                                        <a href="{% url 'cow_detail' cow.id %}" class="cow-detail-btn">
+                                            <span>View Details</span>
+                                            <i class="fas fa-arrow-right btn-arrow"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="empty-state-card fade-in-up">
+                    <div class="empty-state-content">
+                        <div class="empty-icon">
+                            <i class="fas fa-cow"></i>
+                            <div class="icon-glow"></div>
+                        </div>
+                        <h2 class="empty-title">Start Building Your Herd!</h2>
+                        <p class="empty-subtitle">Add your first cow to begin tracking health, feed, and production data with AI-powered insights.</p>
+                        <a href="{% url 'add_cow' %}" class="btn btn-primary btn-lg empty-action-btn">
+                            <i class="fas fa-plus me-2"></i>Add Your First Cow
+                            <div class="btn-shine"></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* ===== VARIABLES ===== */
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #3b82f6;
+    --light-blue: #dbeafe;
+    --primary-yellow: #fbbf24;
+    --secondary-yellow: #fcd34d;
+    --light-yellow: #fef3c7;
+    --white: #ffffff;
+    --light-gray: #f8fafc;
+    --dark-gray: #1f2937;
+    --text-dark: #374151;
+    --text-light: #6b7280;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --transition: all 0.3s ease;
+}
+
+/* ===== DASHBOARD CONTAINER ===== */
+.dashboard-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ===== NAVBAR ===== */
+.dashboard-nav {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    padding: 1rem 0;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1000;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.brand-logo {
+    font-size: 2rem;
+    color: var(--primary-yellow);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    animation: bounce 2s infinite;
+}
+
+.brand-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--white);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: var(--transition);
+}
+
+.nav-item:hover::before {
+    left: 100%;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-icon {
+    font-size: 1.1rem;
+    color: var(--light-yellow);
+}
+
+.nav-text {
+    color: var(--white);
+    font-weight: 500;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 1rem;
+}
+
+.user-welcome {
+    color: var(--light-yellow);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* ===== WELCOME CARD ===== */
+.welcome-card {
+    background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, var(--light-blue) 100%);
+    opacity: 0.3;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.welcome-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border: none;
+    color: var(--white);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
+    border: none;
+    color: var(--dark-gray);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    border: none;
+    color: var(--white);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--secondary-blue);
+    color: var(--secondary-blue);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--secondary-blue);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+
+.btn:hover .btn-shine {
+    left: 150%;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.welcome-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.welcome-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--white);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 2;
+}
+
+.image-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 220px;
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-blue) 100%);
+    border-radius: 50%;
+    opacity: 0.3;
+    filter: blur(20px);
+    animation: pulse 3s infinite;
+}
+
+/* ===== STAT CARDS ===== */
+.stat-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, var(--light-blue) 50%, transparent 100%);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.stat-card:hover .stat-glow {
+    opacity: 0.3;
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+    font-size: 2rem;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow);
+}
+
+.stat-primary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.stat-success {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+}
+
+.stat-warning {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
+}
+
+.stat-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--text-light);
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.trend-up { color: #10b981; }
+.trend-alert { color: #ef4444; }
+.trend-ok { color: #10b981; }
+.trend-idea { color: var(--primary-yellow); }
+.trend-neutral { color: var(--secondary-blue); }
+
+/* ===== SECTION CARDS ===== */
+.section-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    border-bottom: 1px solid #e9ecef;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+}
+
+.header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin: 0;
+}
+
+.view-all-btn {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.view-all-btn:hover {
+    color: var(--primary-blue);
+    transform: translateX(5px);
+}
+
+.section-body {
+    padding: 2rem;
+}
+
+/* ===== COW CARDS ===== */
+.cow-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: var(--transition);
+    overflow: hidden;
+    position: relative;
+}
+
+.cow-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.cow-card-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cow-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--light-yellow) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+}
+
+.cow-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    box-shadow: var(--shadow);
+}
+
+.status-healthy {
+    background: #10b981;
+}
+
+.status-alert {
+    background: #ef4444;
+    animation: pulse 2s infinite;
+}
+
+.cow-card-body {
+    padding: 1rem 1.5rem;
+}
+
+.cow-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.cow-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.detail-icon {
+    width: 16px;
+    color: var(--secondary-blue);
+    font-size: 0.875rem;
+}
+
+.detail-text {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.cow-card-footer {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.cow-detail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--light-yellow) 100%);
+    border: none;
+    border-radius: 8px;
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.cow-detail-btn:hover {
+    background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-yellow) 100%);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-arrow {
+    transition: var(--transition);
+}
+
+.cow-detail-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state-card {
+    background: var(--white);
+    padding: 4rem 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    text-align: center;
+}
+
+.empty-state-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 2rem;
+}
+
+.empty-icon i {
+    font-size: 4rem;
+    color: var(--primary-blue);
+    position: relative;
+    z-index: 2;
+}
+
+.icon-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-blue) 100%);
+    border-radius: 50%;
+    opacity: 0.2;
+    filter: blur(20px);
+    animation: pulse 3s infinite;
+}
+
+.empty-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.empty-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.empty-action-btn {
+    padding: 1.25rem 2.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+@media (max-width: 768px) {
+    .welcome-card {
+        padding: 2rem;
+    }
+    
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        justify-content: center;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .navbar-nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .nav-divider {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-card {
+        padding: 1.5rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .cow-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+// Enhanced dashboard interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stat cards with delay
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        const delay = card.getAttribute('data-delay') || 0;
+        card.style.animationDelay = `${delay}ms`;
+    });
+
+    // Animate cow cards with sequential delay
+    const cowCards = document.querySelectorAll('.cow-card');
+    cowCards.forEach((card, index) => {
+        const delay = card.getAttribute('data-delay') || (index + 1) * 100;
+        card.style.animationDelay = `${delay}ms`;
+    });
+
+    // Add hover effects to navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add click effects to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Update stats with counting animation
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const increment = target / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 16);
+    }
+
+    // Animate stat numbers if they're numeric
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const target = parseInt(stat.textContent);
+        if (!isNaN(target)) {
+            stat.textContent = '0';
+            setTimeout(() => {
+                animateCounter(stat, target);
+            }, 500);
+        }
+    });
+});
+</script>
+{% endblock %}
