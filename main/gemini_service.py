@@ -47,28 +47,48 @@ class AIService:
             
             # Simple test prompt
             simple_prompt = f"Answer this farming question briefly: {message}"
-            print(f"Using prompt: {simple_prompt}")
-            
             response = self.model.generate_content(simple_prompt)
-            print(f"Raw response: {response}")
             
             if response and hasattr(response, 'text') and response.text:
-                print(f"Response text: {response.text}")
                 return response.text.strip()
             else:
-                print("No valid response text found")
                 return "No response generated"
                 
         except Exception as e:
             print(f"Chat error details: {type(e).__name__}: {str(e)}")
-            import traceback
-            traceback.print_exc()
             
-            # Return working response
+            # Check if quota exceeded
+            if "quota" in str(e).lower() or "429" in str(e):
+                return self._get_smart_fallback(message, language)
+            
+            # Return working response for other errors
             if language == 'sw':
                 return f"Nimepokea swali lako kuhusu {message}. Hii ni jibu la msingi."
             else:
                 return f"I received your question about {message}. Here's a basic response."
+    
+    def _get_smart_fallback(self, message, language='en'):
+        """Provide intelligent responses when API quota is exceeded"""
+        message_lower = message.lower()
+        
+        if language == 'sw':
+            if any(word in message_lower for word in ['ugonjwa', 'illness', 'sick', 'disease']):
+                return "Dalili za ugonjwa kwa ng'ombe ni pamoja na: joto la mwili, kutokula vizuri, na maziwa kupungua. Wasiliana na daktari wa wanyamapori."
+            elif any(word in message_lower for word in ['chakula', 'feed', 'lishe']):
+                return "Ng'ombe anahitaji protini 2-3kg, majani 15-20kg, na madini 0.3kg kwa siku. Hakikisha maji yapo kila wakati."
+            elif any(word in message_lower for word in ['maziwa', 'milk']):
+                return "Kuongeza uzalishaji wa maziwa: ongeza protini, hakikisha mazingira ni safi, na ng'ombe apumzike vizuri."
+            else:
+                return f"Asante kwa swali lako kuhusu {message}. Hii ni mfumo wa msingi wa majibu."
+        else:
+            if any(word in message_lower for word in ['illness', 'sick', 'disease', 'health']):
+                return "Signs of cow illness include: fever, loss of appetite, and reduced milk production. Contact a veterinarian for proper diagnosis."
+            elif any(word in message_lower for word in ['feed', 'nutrition', 'food']):
+                return "Cows need 2-3kg protein, 15-20kg silage, and 0.3kg minerals daily. Ensure fresh water is always available."
+            elif any(word in message_lower for word in ['milk', 'production', 'yield']):
+                return "To increase milk production: improve protein intake, maintain clean environment, and ensure proper rest for cows."
+            else:
+                return f"Thank you for your question about {message}. This is a basic response system."
     
     def _format_response(self, text):
         """Clean and format AI response text"""
