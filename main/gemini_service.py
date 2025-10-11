@@ -2,6 +2,7 @@ import google.generativeai as genai
 from django.conf import settings
 import json
 import base64
+import re
 from PIL import Image
 import io
 
@@ -505,3 +506,97 @@ class AIService:
     def _parse_prediction_response(self, response, language):
         # Simple parsing - in production, use more sophisticated parsing
         return {'predicted_yield': 24.8, 'confidence': 92, 'message': response[:100]}
+    def get_personalized_feed_recommendation(self, cow_data, language='en'):
+        """Generate personalized feed recommendation based on cow details and history"""
+        try:
+            prompt = self._build_personalized_feed_prompt(cow_data, language)
+            response = self.model.generate_content(prompt)
+            
+            if response and hasattr(response, 'text') and response.text:
+                return self._parse_personalized_recommendation(response.text)
+            else:
+                return self._get_default_recommendation(cow_data)
+                
+        except Exception as e:
+            print(f"Personalized recommendation error: {e}")
+            return self._get_default_recommendation(cow_data)
+    
+    def _build_personalized_feed_prompt(self, cow_data, language='en'):
+        if language == 'sw':
+            return f"""
+            Toa mapendekezo ya lishe kwa ng'ombe mpya:
+            
+            Jina: {cow_data['name']}
+            Aina: {cow_data['breed']}
+            Umri: {cow_data['age']} miezi
+            Uzito: {cow_data['weight']} kg
+            Hali ya Afya: {cow_data['health_condition']}
+            Historia: {cow_data['production_history']}
+            
+            Toa:
+            PROTINI: [kg]
+            MAJANI: [kg]
+            MADINI: [kg]
+            MAELEZO: [sababu fupi]
+            """
+        else:
+            return f"""
+            Create personalized feed recommendation for new cow:
+            
+            Name: {cow_data['name']}
+            Breed: {cow_data['breed']}
+            Age: {cow_data['age']} months
+            Weight: {cow_data['weight']} kg
+            Health: {cow_data['health_condition']}
+            History: {cow_data['production_history']}
+            
+            Provide:
+            PROTEIN: [kg]
+            SILAGE: [kg]
+            MINERALS: [kg]
+            NOTES: [brief reason]
+            """
+    
+    def _parse_personalized_recommendation(self, response_text):
+        """Parse AI response into structured recommendation"""
+        try:
+            protein_match = re.search(r'PROTEIN.*?(\d+\.?\d*)', response_text, re.IGNORECASE)
+            silage_match = re.search(r'SILAGE.*?(\d+\.?\d*)', response_text, re.IGNORECASE)
+            minerals_match = re.search(r'MINERALS.*?(\d+\.?\d*)', response_text, re.IGNORECASE)
+            notes_match = re.search(r'NOTES.*?:(.*?)(?:\n|$)', response_text, re.IGNORECASE)
+            
+            return {
+                'protein': float(protein_match.group(1)) if protein_match else 2.5,
+                'silage': float(silage_match.group(1)) if silage_match else 15.0,
+                'minerals': float(minerals_match.group(1)) if minerals_match else 0.3,
+                'notes': notes_match.group(1).strip() if notes_match else 'Personalized recommendation'
+            }
+        except:
+            return self._get_default_recommendation({})
+    
+    def _get_default_recommendation(self, cow_data):
+        """Provide default recommendation based on cow details"""
+        age = cow_data.get('age', 24)
+        weight = cow_data.get('weight', 400)
+        health = cow_data.get('health_condition', 'good')
+        
+        # Adjust based on health condition
+        health_multiplier = {
+            'excellent': 1.1,
+            'good': 1.0,
+            'fair': 0.9,
+            'poor': 0.8,
+            'sick': 0.7
+        }.get(health, 1.0)
+        
+        # Base recommendations adjusted for age and weight
+        base_protein = 2.0 + (weight / 200)
+        base_silage = 12.0 + (weight / 30)
+        base_minerals = 0.2 + (weight / 1000)
+        
+        return {
+            'protein': round(base_protein * health_multiplier, 1),
+            'silage': round(base_silage * health_multiplier, 1),
+            'minerals': round(base_minerals * health_multiplier, 2),
+            'notes': f'Customized for {health} health condition'
+        }

@@ -85,16 +85,48 @@ def dashboard(request):
 @login_required
 def add_cow(request):
     if request.method == 'POST':
-        cow = Cow.objects.create(
-            owner=request.user,
-            name=request.POST['name'],
-            tag_number=request.POST['tag_number'],
-            breed=request.POST['breed'],
-            age=int(request.POST['age']),
-            weight=float(request.POST['weight'])
-        )
-        messages.success(request, f'Cow {cow.name} added successfully!')
-        return redirect('cow_list')
+        try:
+            # Create cow with health condition
+            cow = Cow.objects.create(
+                owner=request.user,
+                name=request.POST['name'],
+                tag_number=request.POST['tag_number'],
+                breed=request.POST['breed'],
+                age=int(request.POST['age']),
+                weight=float(request.POST['weight']),
+                health_condition=request.POST.get('health_condition', 'good')
+            )
+            
+            # Generate personalized feed recommendation
+            ai_service = AIService()
+            cow_data = {
+                'name': cow.name,
+                'breed': cow.breed,
+                'age': cow.age,
+                'weight': cow.weight,
+                'health_condition': cow.health_condition,
+                'production_history': 'New cow - no history'
+            }
+            
+            # Get personalized recommendation
+            recommendation = ai_service.get_personalized_feed_recommendation(cow_data)
+            
+            # Create initial feed record
+            if recommendation:
+                FeedRecord.objects.create(
+                    cow=cow,
+                    date=timezone.now().date(),
+                    protein_amount=recommendation.get('protein', 2.5),
+                    silage_amount=recommendation.get('silage', 15.0),
+                    minerals_amount=recommendation.get('minerals', 0.3),
+                    notes=f"AI Recommendation: {recommendation.get('notes', 'Personalized for new cow')}"
+                )
+            
+            messages.success(request, f'Cow {cow.name} added with personalized feed plan!')
+            return redirect('cow_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
     
     return render(request, 'main/add_cow.html')
 

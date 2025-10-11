@@ -3,12 +3,21 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Cow(models.Model):
+    HEALTH_CHOICES = [
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('fair', 'Fair'),
+        ('poor', 'Poor'),
+        ('sick', 'Sick')
+    ]
+    
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     tag_number = models.CharField(max_length=50, unique=True)
     breed = models.CharField(max_length=100)
     age = models.IntegerField()
     weight = models.FloatField()
+    health_condition = models.CharField(max_length=20, choices=HEALTH_CHOICES, default='good')
     date_added = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
