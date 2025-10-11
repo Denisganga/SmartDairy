@@ -105,24 +105,23 @@ class AIService:
             Toa mapendekezo mafupi ya lishe kwa {cow_data['name']}:
             
             Muundo:
-            PROTINI: [kg] - [%]
+            PROTINI: [kg]
             MAJANI: [kg]
             MADINI: [kg]  
             MAZIWA: [L/siku]
             
-            Jibu kwa sentensi 1-2 tu kwa kila kitu.
+            Jibu kwa sentensi MOJA tu. Fupi sana.
             """
         else:
             return f"""
-            Brief feed recommendations for {cow_data['name']}:
+            Brief feed for {cow_data['name']}:
             
-            Format:
-            PROTEIN: [kg] - [% content]
+            PROTEIN: [kg]
             SILAGE: [kg]
             MINERALS: [kg]
             MILK: [L/day]
             
-            Keep each explanation to 1-2 sentences max.
+            Answer in ONE sentence only. Very brief.
             """
     
     def _build_prediction_prompt(self, cow_data, language):
