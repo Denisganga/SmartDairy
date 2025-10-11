@@ -201,15 +201,25 @@ def cow_detail(request, cow_id):
     
     # Generate specific AI feed analysis using Gemini
     analysis_prompt = f"""
-    You are a dairy nutrition expert. For this {cow.breed} cow named {cow.name} ({cow.age} months, {cow.weight}kg), provide specific feed recommendations with nutritional content:
+    You are a dairy nutrition expert. For this {cow.breed} cow named {cow.name} ({cow.age} months, {cow.weight}kg), provide specific feed recommendations using ACTUAL feed names commonly used in Kenya:
+    
+    Use these specific feeds:
+    - Napier grass (majani ya napier)
+    - Dairy meal (unga wa ng'ombe)
+    - Lucerne hay (majani ya lucerne)
+    - Maize silage (silage ya mahindi)
+    - Rhodes grass (majani ya rhodes)
+    - Mineral lick (chumvi ya madini)
+    - Sunflower cake
+    - Cotton seed cake
     
     Format your response like this:
-    "Give [specific feed name] - it contains [percentage]% protein and [benefit]. 
-    Add [another feed] - it has [percentage]% fiber for [benefit].
-    Include [supplement] - provides [specific nutrients] for [benefit]."
+    "Give [specific feed name like napier grass] - it contains [percentage]% [nutrient] and [benefit]. 
+    Add [another feed like dairy meal] - it has [percentage]% [nutrient] for [benefit].
+    Include [supplement like mineral lick] - provides [specific nutrients] for [benefit]."
     
-    Be specific about actual feeds like alfalfa hay, corn silage, soybean meal, etc. and their real nutritional percentages.
-    Make it practical and actionable for a farmer.
+    Be specific about actual feeds like napier grass, dairy meal, lucerne hay, etc. and their real nutritional percentages.
+    Make it practical and actionable for a Kenyan farmer.
     """
     
     try:
@@ -315,19 +325,19 @@ def generate_ai_prediction(cow, health_records, feed_records, production_records
     # Feed recommendations
     feed_recommendations = [
         {
-            'type': 'High-protein concentrate',
+            'type': 'Dairy meal',
             'quantity': '2.5 kg',
-            'reason': 'To boost milk protein content'
+            'reason': 'Contains 18% protein - boosts milk protein content'
         },
         {
-            'type': 'Fresh grass silage',
+            'type': 'Napier grass',
             'quantity': '15 kg',
-            'reason': 'Optimal fiber for digestion'
+            'reason': 'High quality forage - optimal fiber for digestion'
         },
         {
-            'type': 'Mineral supplement',
+            'type': 'Mineral lick',
             'quantity': '0.3 kg',
-            'reason': 'Maintain calcium levels'
+            'reason': 'Essential minerals - maintain calcium levels'
         }
     ]
     

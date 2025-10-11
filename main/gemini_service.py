@@ -142,26 +142,44 @@ class AIService:
     def _build_feed_prompt(self, cow_data, language):
         if language == 'sw':
             return f"""
-            Toa mapendekezo mafupi ya lishe kwa {cow_data['name']}:
+            Wewe ni mtaalamu wa lishe ya ng'ombe. Toa mapendekezo mahususi ya lishe kwa {cow_data['name']} ({cow_data.get('breed', 'Friesian')}, miezi {cow_data.get('age', 24)}, kg {cow_data.get('weight', 450)}):
             
-            Muundo:
-            PROTINI: [kg]
-            MAJANI: [kg]
-            MADINI: [kg]  
-            MAZIWA: [L/siku]
+            Tumia majina halisi ya chakula:
+            - Napier grass (majani ya napier)
+            - Dairy meal (unga wa ng'ombe wa maziwa)
+            - Lucerne hay (majani ya lucerne)
+            - Maize silage (silage ya mahindi)
+            - Mineral lick (chumvi ya madini)
+            - Rhodes grass (majani ya rhodes)
+            - Boma rhodes (majani ya boma)
             
-            Jibu kwa sentensi MOJA tu. Fupi sana.
+            Muundo wa jibu:
+            1. [Jina la chakula] - [kg] - [sababu/faida]
+            2. [Jina la chakula] - [kg] - [sababu/faida]  
+            3. [Jina la chakula] - [kg] - [sababu/faida]
+            
+            Jibu kwa Kiswahili. Tumia majina halisi ya chakula.
             """
         else:
             return f"""
-            Brief feed for {cow_data['name']}:
+            You are a dairy nutrition expert. Provide specific feed recommendations for {cow_data['name']} ({cow_data.get('breed', 'Friesian')}, {cow_data.get('age', 24)} months, {cow_data.get('weight', 450)}kg):
             
-            PROTEIN: [kg]
-            SILAGE: [kg]
-            MINERALS: [kg]
-            MILK: [L/day]
+            Use actual feed names:
+            - Napier grass
+            - Dairy meal/concentrate
+            - Lucerne hay
+            - Maize silage
+            - Rhodes grass
+            - Mineral lick
+            - Sunflower cake
+            - Cotton seed cake
             
-            Answer in ONE sentence only. Very brief.
+            Format:
+            1. [Specific feed name] - [kg amount] - [reason/benefit]
+            2. [Specific feed name] - [kg amount] - [reason/benefit]
+            3. [Specific feed name] - [kg amount] - [reason/benefit]
+            
+            Use real feed names, not generic categories.
             """
     
     def _build_prediction_prompt(self, cow_data, language):
@@ -333,17 +351,17 @@ class AIService:
         if language == 'sw':
             return {
                 'recommendations': [
-                    {'type': 'Chakula cha protini', 'quantity': '2.5 kg', 'reason': 'Kuongeza protini katika maziwa'},
-                    {'type': 'Majani ya silage', 'quantity': '15 kg', 'reason': 'Kutoa nyuzi muhimu'},
-                    {'type': 'Madini', 'quantity': '0.3 kg', 'reason': 'Kudumisha kiwango cha kalsiamu'}
+                    {'type': 'Dairy meal', 'quantity': '2.5 kg', 'reason': 'Ina protini 18% - kuongeza protini katika maziwa'},
+                    {'type': 'Napier grass', 'quantity': '15 kg', 'reason': 'Majani mazuri ya nyuzi - kutoa nyuzi muhimu'},
+                    {'type': 'Mineral lick', 'quantity': '0.3 kg', 'reason': 'Ina madini muhimu - kudumisha kiwango cha kalsiamu'}
                 ]
             }
         else:
             return {
                 'recommendations': [
-                    {'type': 'High-protein concentrate', 'quantity': '2.5 kg', 'reason': 'To boost milk protein content'},
-                    {'type': 'Fresh grass silage', 'quantity': '15 kg', 'reason': 'Optimal fiber for digestion'},
-                    {'type': 'Mineral supplement', 'quantity': '0.3 kg', 'reason': 'Maintain calcium levels'}
+                    {'type': 'Dairy meal', 'quantity': '2.5 kg', 'reason': 'Contains 18% protein - boosts milk protein content'},
+                    {'type': 'Napier grass', 'quantity': '15 kg', 'reason': 'High quality forage - optimal fiber for digestion'},
+                    {'type': 'Mineral lick', 'quantity': '0.3 kg', 'reason': 'Essential minerals - maintain calcium levels'}
                 ]
             }
     
@@ -419,21 +437,38 @@ class AIService:
         return {'recommendations': recommendations[:3]}  # Limit to 3 recommendations
     
     def _extract_feed_type(self, line, category):
-        # Extract feed type from line
-        if 'concentrate' in line.lower():
-            return 'Dairy concentrate'
-        elif 'silage' in line.lower():
-            return 'Corn silage'
-        elif 'hay' in line.lower():
-            return 'Alfalfa hay'
-        elif 'mineral' in line.lower():
-            return 'Mineral mix'
+        # Extract specific feed type from line
+        line_lower = line.lower()
+        
+        # Check for specific feed names
+        if 'napier' in line_lower:
+            return 'Napier grass'
+        elif 'dairy meal' in line_lower or 'concentrate' in line_lower:
+            return 'Dairy meal'
+        elif 'lucerne' in line_lower:
+            return 'Lucerne hay'
+        elif 'maize silage' in line_lower or 'corn silage' in line_lower:
+            return 'Maize silage'
+        elif 'rhodes' in line_lower:
+            return 'Rhodes grass'
+        elif 'boma' in line_lower:
+            return 'Boma rhodes'
+        elif 'mineral' in line_lower or 'lick' in line_lower:
+            return 'Mineral lick'
+        elif 'sunflower' in line_lower:
+            return 'Sunflower cake'
+        elif 'cotton' in line_lower:
+            return 'Cotton seed cake'
+        elif 'silage' in line_lower:
+            return 'Maize silage'
+        elif 'hay' in line_lower:
+            return 'Lucerne hay'
         elif category == 'protein':
-            return 'Protein concentrate'
+            return 'Dairy meal'
         elif category == 'fiber':
-            return 'Grass silage'
+            return 'Napier grass'
         else:
-            return 'Mineral supplement'
+            return 'Mineral lick'
     
     def _extract_quantity(self, line):
         # Extract quantity from line
@@ -458,48 +493,48 @@ class AIService:
         # Adjust recommendations based on breed and age
         if breed.lower() in ['holstein', 'friesian']:
             protein_amount = 2.8 if age > 24 else 2.5
-            silage_amount = 16 if weight > 550 else 14
+            grass_amount = 16 if weight > 550 else 14
         elif breed.lower() in ['jersey']:
             protein_amount = 2.2 if age > 24 else 2.0
-            silage_amount = 12 if weight > 400 else 10
+            grass_amount = 12 if weight > 400 else 10
         else:
             protein_amount = 2.5
-            silage_amount = 14
+            grass_amount = 14
         
         if language == 'sw':
             return [
                 {
-                    'type': f'Chakula cha protini cha {breed}',
+                    'type': 'Dairy meal',
                     'quantity': f'{protein_amount} kg',
-                    'reason': f'Inafaa kwa aina ya {breed} ya umri wa miezi {age}'
+                    'reason': f'Ina protini 18% - inafaa kwa {breed} ya miezi {age}'
                 },
                 {
-                    'type': 'Majani ya silage',
-                    'quantity': f'{silage_amount} kg',
-                    'reason': f'Inatoa nyuzi muhimu kwa ng\'ombe wa kilo {weight}'
+                    'type': 'Napier grass',
+                    'quantity': f'{grass_amount} kg',
+                    'reason': f'Majani mazuri ya nyuzi - inafaa ng\'ombe wa kilo {weight}'
                 },
                 {
-                    'type': 'Mchanganyiko wa madini',
+                    'type': 'Mineral lick',
                     'quantity': '0.3 kg',
-                    'reason': 'Kudumisha afya na uzalishaji wa juu'
+                    'reason': 'Ina madini muhimu - kudumisha afya na maziwa mengi'
                 }
             ]
         else:
             return [
                 {
-                    'type': f'{breed} protein concentrate',
+                    'type': 'Dairy meal',
                     'quantity': f'{protein_amount} kg',
-                    'reason': f'Optimized for {breed} breed at {age} months old'
+                    'reason': f'Contains 18% protein - optimal for {breed} at {age} months'
                 },
                 {
-                    'type': 'Premium grass silage',
-                    'quantity': f'{silage_amount} kg',
-                    'reason': f'Provides optimal fiber for {weight}kg cow'
+                    'type': 'Napier grass',
+                    'quantity': f'{grass_amount} kg',
+                    'reason': f'High fiber content - suitable for {weight}kg cow'
                 },
                 {
-                    'type': 'Mineral-vitamin mix',
+                    'type': 'Mineral lick',
                     'quantity': '0.3 kg',
-                    'reason': 'Maintains health and peak milk production'
+                    'reason': 'Essential minerals - maintains health and milk production'
                 }
             ]
     
@@ -714,7 +749,7 @@ class AIService:
         conditions_text = ", ".join(special_conditions) if special_conditions else "none"
         
         return f"""
-        As a dairy nutrition expert, create a highly personalized feed plan for this specific cow:
+        As a dairy nutrition expert, create a highly personalized feed plan for this specific cow using ACTUAL feed names:
         
         COW PROFILE:
         - Name: {cow_profile.get('name', 'Unknown')}
@@ -724,13 +759,20 @@ class AIService:
         - Health: {cow_profile.get('health_condition', 'good')} (Health-adjusted nutrition)
         - Special Conditions: {conditions_text} (Critical for nutrition adjustments)
         
-        Provide SPECIFIC feed quantities considering ALL factors especially special conditions:
+        Use these SPECIFIC feed types and provide exact quantities:
         
-        PROTEIN: [exact kg amount] - [why this amount for THIS cow with these conditions]
-        SILAGE: [exact kg amount] - [why this amount for THIS cow with these conditions]  
-        MINERALS: [exact kg amount] - [why this amount for THIS cow with these conditions]
+        DAIRY MEAL: [exact kg amount] - [why this amount for THIS cow with these conditions]
+        NAPIER GRASS: [exact kg amount] - [why this amount for THIS cow with these conditions]  
+        MINERAL LICK: [exact kg amount] - [why this amount for THIS cow with these conditions]
         
-        EXPLANATION: Write a detailed paragraph explaining why these specific amounts are perfect for {cow_profile.get('name', 'this cow')}, mentioning the breed characteristics, age requirements, weight considerations, health status, and ESPECIALLY how the special conditions ({conditions_text}) influence the nutrition plan. Be specific about how each factor influences the nutrition plan.
+        You may also recommend:
+        - Lucerne hay
+        - Maize silage  
+        - Rhodes grass
+        - Sunflower cake
+        - Cotton seed cake
+        
+        EXPLANATION: Write a detailed paragraph explaining why these specific feeds and amounts are perfect for {cow_profile.get('name', 'this cow')}, mentioning the breed characteristics, age requirements, weight considerations, health status, and ESPECIALLY how the special conditions ({conditions_text}) influence the nutrition plan. Use actual feed names like "napier grass" and "dairy meal" instead of generic terms.
         
         Make it personal and specific to THIS individual cow with these exact conditions.
         """
@@ -738,15 +780,25 @@ class AIService:
     def _parse_feed_plan_response(self, response_text, cow_profile):
         """Parse AI response into structured feed plan"""
         try:
-            protein_match = re.search(r'PROTEIN:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
-            silage_match = re.search(r'SILAGE:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
-            minerals_match = re.search(r'MINERALS:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            # Look for specific feed names
+            dairy_meal_match = re.search(r'DAIRY MEAL:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            napier_match = re.search(r'NAPIER GRASS:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            mineral_match = re.search(r'MINERAL LICK:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            
+            # Fallback to generic terms if specific names not found
+            if not dairy_meal_match:
+                dairy_meal_match = re.search(r'PROTEIN:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            if not napier_match:
+                napier_match = re.search(r'SILAGE:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            if not mineral_match:
+                mineral_match = re.search(r'MINERALS:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            
             explanation_match = re.search(r'EXPLANATION:\s*(.*?)(?:\n\n|$)', response_text, re.IGNORECASE | re.DOTALL)
             
             quantities = {
-                'protein': protein_match.group(1) if protein_match else self._calculate_protein(cow_profile),
-                'silage': silage_match.group(1) if silage_match else self._calculate_silage(cow_profile),
-                'minerals': minerals_match.group(1) if minerals_match else self._calculate_minerals(cow_profile)
+                'protein': dairy_meal_match.group(1) if dairy_meal_match else self._calculate_protein(cow_profile),
+                'silage': napier_match.group(1) if napier_match else self._calculate_silage(cow_profile),
+                'minerals': mineral_match.group(1) if mineral_match else self._calculate_minerals(cow_profile)
             }
             
             explanation = explanation_match.group(1).strip() if explanation_match else self._generate_explanation(cow_profile, quantities)
