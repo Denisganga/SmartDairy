@@ -27,7 +27,54 @@
                             <div class="cow-info">
                                 <span class="badge bg-primary me-2">{{ cow.breed }}</span>
                                 <span class="badge bg-secondary me-2">Tag: {{ cow.tag_number }}</span>
-                                <span class="badge bg-info">{{ cow.age }} months old</span>
+                                <span class="badge bg-info me-2">{{ cow.age }} months old</span>
+                                <span class="badge bg-success" id="healthBadge">{{ cow.health_condition|title }}</span>
+                            </div>
+                            
+                            <!-- Dynamic Health Condition Manager -->
+                            <div class="card mt-3 health-manager">
+                                <div class="card-header bg-gradient-primary text-white">
+                                    <h6 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Health Condition Manager</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Update Health Condition:</label>
+                                            <select class="form-select" id="newHealthCondition">
+                                                <option value="excellent">🌟 Excellent</option>
+                                                <option value="good">✅ Good</option>
+                                                <option value="fair">⚠️ Fair</option>
+                                                <option value="poor">❌ Poor</option>
+                                                <option value="sick">🤒 Sick</option>
+                                                <option value="recovering">🔄 Recovering</option>
+                                                <option value="pregnant">🤱 Pregnant</option>
+                                                <option value="lactating">🥛 Lactating</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Custom Condition:</label>
+                                            <input type="text" class="form-control" id="customCondition" placeholder="Enter custom condition...">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary me-2" onclick="applyHealthCondition()">
+                                            <i class="fas fa-magic me-1"></i>Apply & Get AI Insights
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="regenerateInsights()">
+                                            <i class="fas fa-sync me-1"></i>Regenerate Insights
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Insights Panel -->
+                            <div class="card mt-3 ai-insights-panel" id="aiInsightsPanel" style="display: none;">
+                                <div class="card-header bg-gradient-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-brain me-2"></i>AI Health Insights</h6>
+                                </div>
+                                <div class="card-body" id="aiInsightsContent">
+                                    <!-- Dynamic AI content will be loaded here -->
+                                </div>
                             </div>
                             <p class="mt-2 text-muted">Weight: {{ cow.weight }} kg | Added: {{ cow.date_added|date:"M d, Y" }}</p>
                         </div>
@@ -1140,3 +1187,315 @@ function saveMilk(recordId) {
 }
 </script>
 {% endblock %}
+let currentHealthCondition = '{{ cow.health_condition }}';
+
+function applyHealthCondition() {
+    const selectedCondition = document.getElementById('newHealthCondition').value;
+    const customCondition = document.getElementById('customCondition').value.trim();
+    const finalCondition = customCondition || selectedCondition;
+    
+    // Update UI with animation
+    updateHealthBadge(finalCondition);
+    
+    // Get AI insights for the new condition
+    getAIHealthInsights(finalCondition);
+    
+    // Update backend
+    updateHealthConditionBackend(finalCondition);
+}
+
+function updateHealthBadge(condition) {
+    const badge = document.getElementById('healthBadge');
+    const conditionEmojis = {
+        'excellent': '🌟',
+        'good': '✅',
+        'fair': '⚠️',
+        'poor': '❌',
+        'sick': '🤒',
+        'recovering': '🔄',
+        'pregnant': '🤱',
+        'lactating': '🥛'
+    };
+    
+    const conditionColors = {
+        'excellent': 'bg-success',
+        'good': 'bg-primary',
+        'fair': 'bg-warning',
+        'poor': 'bg-danger',
+        'sick': 'bg-danger',
+        'recovering': 'bg-info',
+        'pregnant': 'bg-purple',
+        'lactating': 'bg-success'
+    };
+    
+    // Animate badge change
+    badge.style.transform = 'scale(0.8)';
+    badge.style.opacity = '0.5';
+    
+    setTimeout(() => {
+        badge.className = `badge ${conditionColors[condition] || 'bg-secondary'}`;
+        badge.innerHTML = `${conditionEmojis[condition] || '📊'} ${condition.charAt(0).toUpperCase() + condition.slice(1)}`;
+        badge.style.transform = 'scale(1)';
+        badge.style.opacity = '1';
+    }, 200);
+    
+    currentHealthCondition = condition;
+}
+
+function getAIHealthInsights(condition) {
+    const panel = document.getElementById('aiInsightsPanel');
+    const content = document.getElementById('aiInsightsContent');
+    
+    // Show panel with loading animation
+    panel.style.display = 'block';
+    content.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generating insights...</span>
+            </div>
+            <p class="mt-2">🧠 AI is analyzing ${condition} condition...</p>
+        </div>
+    `;
+    
+    // Call AI service
+    fetch('/api/get-health-insights/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            cow_id: {{ cow.id }},
+            health_condition: condition,
+            cow_details: {
+                name: '{{ cow.name }}',
+                breed: '{{ cow.breed }}',
+                age: {{ cow.age }},
+                weight: {{ cow.weight }}
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayFormattedInsights(data.insights, condition);
+        } else {
+            displayFallbackInsights(condition);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        displayFallbackInsights(condition);
+    });
+}
+
+function displayFormattedInsights(insights, condition) {
+    const content = document.getElementById('aiInsightsContent');
+    const conditionIcons = {
+        'excellent': '🌟',
+        'good': '✅',
+        'fair': '⚠️',
+        'poor': '❌',
+        'sick': '🤒',
+        'recovering': '🔄',
+        'pregnant': '🤱',
+        'lactating': '🥛'
+    };
+    
+    content.innerHTML = `
+        <div class="insights-container">
+            <div class="insight-header">
+                <h5>${conditionIcons[condition] || '📊'} ${condition.charAt(0).toUpperCase() + condition.slice(1)} Condition Analysis</h5>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="insight-card bg-light p-3 rounded">
+                        <h6><i class="fas fa-utensils text-primary"></i> Nutrition Plan</h6>
+                        <div class="nutrition-details">
+                            ${insights.nutrition || 'Optimized feeding schedule recommended'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="insight-card bg-light p-3 rounded">
+                        <h6><i class="fas fa-stethoscope text-success"></i> Health Actions</h6>
+                        <div class="health-actions">
+                            ${insights.health_actions || 'Monitor vital signs regularly'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="insight-card bg-light p-3 rounded">
+                        <h6><i class="fas fa-chart-line text-info"></i> Expected Outcomes</h6>
+                        <div class="outcomes">
+                            ${insights.outcomes || 'Positive health trajectory expected'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <h6><i class="fas fa-lightbulb"></i> AI Recommendation</h6>
+                <p class="mb-0">${insights.recommendation || 'Continue monitoring and maintain current care routine.'}</p>
+            </div>
+            
+            <div class="text-muted small mt-2">
+                <i class="fas fa-robot"></i> Generated by Gemini AI • ${new Date().toLocaleString()}
+            </div>
+        </div>
+    `;
+}
+
+function displayFallbackInsights(condition) {
+    const content = document.getElementById('aiInsightsContent');
+    const fallbackInsights = {
+        'excellent': {
+            nutrition: 'Maintain current high-quality feed. Increase protein by 10%.',
+            health_actions: 'Continue regular health checks. Monitor for any changes.',
+            outcomes: 'Expect optimal milk production and reproductive health.',
+            recommendation: 'Your cow is in excellent condition! Keep up the great care routine.'
+        },
+        'sick': {
+            nutrition: 'Reduce feed by 20%. Focus on easily digestible foods.',
+            health_actions: 'Contact veterinarian immediately. Isolate if necessary.',
+            outcomes: 'Recovery expected with proper treatment within 5-7 days.',
+            recommendation: 'Immediate veterinary attention required. Monitor closely.'
+        },
+        'pregnant': {
+            nutrition: 'Increase calcium and protein. Add prenatal supplements.',
+            health_actions: 'Schedule regular pregnancy checks. Prepare calving area.',
+            outcomes: 'Healthy calf expected. Monitor for calving signs.',
+            recommendation: 'Special care needed during pregnancy. Adjust feeding schedule.'
+        }
+    };
+    
+    const insights = fallbackInsights[condition] || fallbackInsights['excellent'];
+    displayFormattedInsights(insights, condition);
+}
+
+function regenerateInsights() {
+    if (currentHealthCondition) {
+        getAIHealthInsights(currentHealthCondition);
+    }
+}
+
+function updateHealthConditionBackend(condition) {
+    fetch('/api/update-health-condition/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            cow_id: {{ cow.id }},
+            health_condition: condition
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Health condition updated successfully');
+        }
+    })
+    .catch(error => console.error('Error updating health condition:', error));
+}
+/* Health Manager Styling */
+.health-manager {
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.ai-insights-panel {
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 15px;
+    overflow: hidden;
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.insights-container {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.insight-card {
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.insight-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.nutrition-details, .health-actions, .outcomes {
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #555;
+}
+
+#healthBadge {
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+    padding: 8px 12px;
+}
+
+.bg-purple {
+    background-color: #9b59b6 !important;
+}
+
+.form-select, .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}

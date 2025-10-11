@@ -600,3 +600,97 @@ class AIService:
             'minerals': round(base_minerals * health_multiplier, 2),
             'notes': f'Customized for {health} health condition'
         }
+    def get_health_insights(self, cow_details, health_condition, language='en'):
+        """Generate comprehensive health insights using Gemini AI"""
+        try:
+            prompt = self._build_health_insights_prompt(cow_details, health_condition, language)
+            response = self.model.generate_content(prompt)
+            
+            if response and hasattr(response, 'text') and response.text:
+                return self._parse_health_insights(response.text, health_condition)
+            else:
+                return self._get_fallback_health_insights(health_condition)
+                
+        except Exception as e:
+            print(f"Health insights error: {e}")
+            return self._get_fallback_health_insights(health_condition)
+    
+    def _build_health_insights_prompt(self, cow_details, health_condition, language='en'):
+        return f"""
+        As a veterinary AI expert, provide comprehensive health insights for a dairy cow:
+        
+        Cow Details:
+        - Name: {cow_details.get('name', 'Unknown')}
+        - Breed: {cow_details.get('breed', 'Unknown')}
+        - Age: {cow_details.get('age', 0)} months
+        - Weight: {cow_details.get('weight', 0)} kg
+        - Current Health: {health_condition}
+        
+        Provide detailed insights in this format:
+        NUTRITION: [Specific feeding recommendations for this condition]
+        HEALTH_ACTIONS: [Immediate actions needed]
+        OUTCOMES: [Expected results and timeline]
+        RECOMMENDATION: [Overall advice and next steps]
+        
+        Be specific, actionable, and professional. Consider the breed and age.
+        """
+    
+    def _parse_health_insights(self, response_text, condition):
+        """Parse AI response into structured insights"""
+        try:
+            nutrition_match = re.search(r'NUTRITION:\s*(.*?)(?=HEALTH_ACTIONS:|$)', response_text, re.IGNORECASE | re.DOTALL)
+            health_match = re.search(r'HEALTH_ACTIONS:\s*(.*?)(?=OUTCOMES:|$)', response_text, re.IGNORECASE | re.DOTALL)
+            outcomes_match = re.search(r'OUTCOMES:\s*(.*?)(?=RECOMMENDATION:|$)', response_text, re.IGNORECASE | re.DOTALL)
+            recommendation_match = re.search(r'RECOMMENDATION:\s*(.*?)$', response_text, re.IGNORECASE | re.DOTALL)
+            
+            return {
+                'nutrition': nutrition_match.group(1).strip() if nutrition_match else self._get_default_nutrition(condition),
+                'health_actions': health_match.group(1).strip() if health_match else self._get_default_actions(condition),
+                'outcomes': outcomes_match.group(1).strip() if outcomes_match else self._get_default_outcomes(condition),
+                'recommendation': recommendation_match.group(1).strip() if recommendation_match else self._get_default_recommendation_text(condition)
+            }
+        except:
+            return self._get_fallback_health_insights(condition)
+    
+    def _get_fallback_health_insights(self, condition):
+        """Provide intelligent fallback insights"""
+        insights_map = {
+            'excellent': {
+                'nutrition': 'Maintain premium feed quality. Increase protein to 18-20% for optimal milk production. Add vitamin E and selenium supplements.',
+                'health_actions': 'Continue regular health monitoring. Schedule quarterly vet checkups. Monitor body condition score weekly.',
+                'outcomes': 'Expect 25-30L daily milk yield. Excellent reproductive performance. Strong immunity against diseases.',
+                'recommendation': 'Your cow is in peak condition! Maintain current care routine and consider breeding programs for genetic improvement.'
+            },
+            'sick': {
+                'nutrition': 'Reduce feed to 70% normal amount. Provide easily digestible feeds. Increase water intake. Add electrolyte supplements.',
+                'health_actions': 'Contact veterinarian immediately. Isolate from herd. Monitor temperature every 4 hours. Check for dehydration signs.',
+                'outcomes': 'Recovery expected in 5-10 days with proper treatment. Milk production may drop 40-60% temporarily.',
+                'recommendation': 'Immediate veterinary intervention required. Follow prescribed medication schedule strictly. Monitor closely for complications.'
+            },
+            'pregnant': {
+                'nutrition': 'Increase calcium by 25%. Add folic acid supplements. Provide high-quality protein (16-18%). Reduce stress factors.',
+                'health_actions': 'Schedule monthly pregnancy checks. Prepare calving area. Monitor for pregnancy complications. Vaccinate as per schedule.',
+                'outcomes': 'Healthy calf expected in gestation period. Gradual milk production increase. Prepare for calving in final trimester.',
+                'recommendation': 'Special pregnancy care protocol activated. Adjust feeding schedule for fetal development. Prepare for calving management.'
+            },
+            'lactating': {
+                'nutrition': 'High-energy diet required. Increase protein to 18-20%. Provide 80-120L water daily. Add calcium and phosphorus.',
+                'health_actions': 'Monitor udder health daily. Check for mastitis signs. Maintain milking hygiene. Schedule regular milk quality tests.',
+                'outcomes': 'Peak milk production expected 6-8 weeks post-calving. Maintain 20-35L daily yield with proper nutrition.',
+                'recommendation': 'Optimize lactation management. Focus on udder health and milk quality. Balance nutrition for sustained production.'
+            }
+        }
+        
+        return insights_map.get(condition, insights_map['excellent'])
+    
+    def _get_default_nutrition(self, condition):
+        return f"Specialized nutrition plan for {condition} condition recommended."
+    
+    def _get_default_actions(self, condition):
+        return f"Monitor cow closely and adjust care routine for {condition} status."
+    
+    def _get_default_outcomes(self, condition):
+        return f"Positive health outcomes expected with proper {condition} management."
+    
+    def _get_default_recommendation_text(self, condition):
+        return f"Continue monitoring and maintain appropriate care for {condition} condition."

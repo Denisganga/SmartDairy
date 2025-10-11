@@ -507,3 +507,55 @@ def add_manual_entry_api(request, cow_id):
         })
     
     return JsonResponse({'success': False}, status=400)
+@login_required
+def get_health_insights_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cow_id = data.get('cow_id')
+            health_condition = data.get('health_condition')
+            cow_details = data.get('cow_details', {})
+            
+            cow = get_object_or_404(Cow, id=cow_id, owner=request.user)
+            
+            # Get AI insights using Gemini
+            ai_service = AIService()
+            insights = ai_service.get_health_insights(cow_details, health_condition)
+            
+            return JsonResponse({
+                'success': True,
+                'insights': insights
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def update_health_condition_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cow_id = data.get('cow_id')
+            health_condition = data.get('health_condition')
+            
+            cow = get_object_or_404(Cow, id=cow_id, owner=request.user)
+            cow.health_condition = health_condition
+            cow.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Health condition updated successfully'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
