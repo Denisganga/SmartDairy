@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Sum
 from django.http import JsonResponse
 from .models import Cow, HealthRecord, FeedRecord, ProductionRecord, DailyFeedRecord
-from .gemini_service import AIService
+from .gemini_service import GeminiAIService
 import json
 from datetime import datetime, timedelta
 
@@ -155,7 +155,7 @@ def cow_detail(request, cow_id):
         })
     
     # AI Prediction - use real Gemini API
-    ai_service = AIService()
+    ai_service = GeminiAIService()
     cow_data = {
         'name': cow.name,
         'breed': cow.breed,
@@ -229,17 +229,23 @@ def chatbot(request):
 @login_required
 def chat_api(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        message = data.get('message', '')
-        language = data.get('language', 'en')
-        
-        ai_service = AIService()
-        response = ai_service.chat_response(message, language)
-        
-        return JsonResponse({
-            'response': response,
-            'language': language
-        })
+        try:
+            data = json.loads(request.body)
+            message = data.get('message', '')
+            language = data.get('language', 'en')
+            
+            ai_service = GeminiAIService()
+            response = ai_service.chat_response(message, language)
+            
+            return JsonResponse({
+                'response': response,
+                'language': language
+            })
+        except Exception as e:
+            return JsonResponse({
+                'response': 'Sorry, I encountered an error. Please try again.',
+                'error': str(e)
+            })
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -253,7 +259,7 @@ def analyze_disease_api(request):
         image_file = request.FILES['image']
         language = request.POST.get('language', 'en')
         
-        ai_service = AIService()
+        ai_service = GeminiAIService()
         analysis = ai_service.analyze_disease_photo(image_file, language)
         
         return JsonResponse({
@@ -315,7 +321,7 @@ def apply_recommendation_api(request, cow_id):
         cow = get_object_or_404(Cow, id=cow_id, owner=request.user)
         
         # Get real AI recommendation
-        ai_service = AIService()
+        ai_service = GeminiAIService()
         cow_data = {
             'name': cow.name,
             'breed': cow.breed,

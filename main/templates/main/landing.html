@@ -2,10 +2,16 @@
 {% load static %}
 
 {% block content %}
-<!-- Navigation -->
+<!-- Enhanced Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="#"><i class="fas fa-cow"></i> Smart Dairy</a>
+        <a class="navbar-brand" href="#">
+            <div class="brand-container">
+                <i class="fas fa-cow"></i>
+                <span>Smart Dairy</span>
+                <span class="beta-badge">AI</span>
+            </div>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -13,7 +19,18 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
                 <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-globe"></i> Language
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><a class="dropdown-item" href="#">English</a></li>
+                        <li><a class="dropdown-item" href="#">Kiswahili</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="{% url 'login' %}">Login</a></li>
                 <li class="nav-item"><a class="nav-link btn btn-primary ms-2" href="{% url 'register' %}">Register</a></li>
             </ul>
@@ -21,32 +38,58 @@
     </div>
 </nav>
 
-<!-- Hero Section -->
+<!-- Enhanced Hero Section -->
 <section id="home" class="hero-section">
     <div class="hero-overlay"></div>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+    </div>
     <div class="container">
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-6">
                 <div class="hero-content fade-in-up">
+                    <div class="hero-badge">
+                        <span class="badge-text">AI-Powered Dairy Solutions</span>
+                    </div>
                     <h1 class="hero-title">Revolutionize Your Dairy Farm with <span class="text-gradient">Advanced AI</span></h1>
                     <p class="hero-subtitle">Harness the power of cutting-edge AI to analyze your cows' health, feed patterns, and production data to maximize milk yield and farm profitability.</p>
                     <div class="hero-buttons">
-                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3 pulse-btn">Start Free Trial</a>
-                        <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3 pulse-btn">
+                            <span class="btn-content">
+                                <span class="btn-text">Start Free Trial</span>
+                                <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                            </span>
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">
+                            <span class="btn-content">
+                                <span class="btn-text">Learn More</span>
+                                <span class="btn-icon"><i class="fas fa-chevron-down"></i></span>
+                            </span>
+                        </a>
                     </div>
                     <div class="hero-stats mt-4">
                         <div class="row">
                             <div class="col-4 text-center">
-                                <div class="stat-number counter" data-target="95">0</div>
-                                <div class="stat-label">% Accuracy</div>
+                                <div class="stat-container">
+                                    <div class="stat-number counter" data-target="95">0</div>
+                                    <div class="stat-label">% Accuracy</div>
+                                </div>
                             </div>
                             <div class="col-4 text-center">
-                                <div class="stat-number counter" data-target="30">0</div>
-                                <div class="stat-label">% More Milk</div>
+                                <div class="stat-container">
+                                    <div class="stat-number counter" data-target="30">0</div>
+                                    <div class="stat-label">% More Milk</div>
+                                </div>
                             </div>
                             <div class="col-4 text-center">
-                                <div class="stat-number counter" data-target="500">0</div>
-                                <div class="stat-label">+ Farmers</div>
+                                <div class="stat-container">
+                                    <div class="stat-number counter" data-target="500">0</div>
+                                    <div class="stat-label">+ Farmers</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -54,23 +97,49 @@
             </div>
             <div class="col-lg-6">
                 <div class="hero-image fade-in-right">
-                    <img src="{% static 'images/cows.jpg' %}" alt="Smart Dairy Cows" class="img-fluid rounded-3 shadow-lg floating">
+                    <div class="image-container">
+                        <img src="{% static 'images/cows.jpg' %}" alt="Smart Dairy Cows" class="img-fluid rounded-3 shadow-lg floating">
+                        <div class="image-overlay">
+                            <div class="overlay-content">
+                                <h4>Smart Monitoring</h4>
+                                <p>Real-time health tracking</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="floating-cards">
+                        <div class="floating-card card-1">
+                            <i class="fas fa-robot"></i>
+                            <span>AI Analysis</span>
+                        </div>
+                        <div class="floating-card card-2">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>Health Check</span>
+                        </div>
+                        <div class="floating-card card-3">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Production Stats</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="scroll-indicator">
+        <div class="scroll-text">Scroll to explore</div>
         <div class="scroll-arrow"></div>
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- Enhanced Features Section -->
 <section id="features" class="features-section py-5">
     <div class="container">
         <div class="row">
             <div class="col-12 text-center mb-5">
-                <h2 class="section-title fade-in-up">Powered by Advanced AI</h2>
-                <p class="section-subtitle fade-in-up">Machine learning with multilingual support</p>
+                <div class="section-header">
+                    <h2 class="section-title fade-in-up">Powered by Advanced AI</h2>
+                    <p class="section-subtitle fade-in-up">Machine learning with multilingual support</p>
+                    <div class="section-divider"></div>
+                </div>
             </div>
         </div>
         <div class="row g-4">
@@ -81,6 +150,9 @@
                     </div>
                     <h4>AI Feed Optimization</h4>
                     <p>Analyze historical feed data, health records, and production metrics to recommend optimal nutrition plans for each cow.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
@@ -90,6 +162,9 @@
                     </div>
                     <h4>Production Prediction</h4>
                     <p>Predict milk production trends and identify factors that maximize yield using advanced machine learning models.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
@@ -99,13 +174,113 @@
                     </div>
                     <h4>Health Monitoring</h4>
                     <p>Track cow health patterns and receive early warnings about potential health issues before they impact production.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card fade-in-up" data-delay="400">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>Multilingual Chatbot</h4>
+                    <p>Get expert advice in your preferred language, including Kiswahili, with our intelligent dairy farming assistant.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card fade-in-up" data-delay="500">
+                    <div class="feature-icon">
+                        <i class="fas fa-disease"></i>
+                    </div>
+                    <h4>Disease Detection</h4>
+                    <p>Early detection of common dairy cattle diseases with AI-powered analysis and treatment recommendations.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card fade-in-up" data-delay="600">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Mobile Integration</h4>
+                    <p>Access all features on your mobile device with our responsive design and dedicated mobile app.</p>
+                    <div class="feature-footer">
+                        <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Video Section -->
+<!-- How It Works Section -->
+<section id="how-it-works" class="how-it-works-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <div class="section-header">
+                    <h2 class="section-title fade-in-up">How It Works</h2>
+                    <p class="section-subtitle fade-in-up">Simple steps to transform your dairy farming</p>
+                    <div class="section-divider"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="process-steps">
+                    <div class="process-step fade-in-up" data-delay="100">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h4>Data Collection</h4>
+                            <p>Input your farm data including cow health records, feed information, and production metrics.</p>
+                        </div>
+                        <div class="step-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                    </div>
+                    <div class="process-step fade-in-up" data-delay="200">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h4>AI Analysis</h4>
+                            <p>Our advanced algorithms analyze your data to identify patterns and optimization opportunities.</p>
+                        </div>
+                        <div class="step-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="process-step fade-in-up" data-delay="300">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h4>Smart Recommendations</h4>
+                            <p>Receive personalized recommendations for feed optimization, health management, and production improvement.</p>
+                        </div>
+                        <div class="step-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                    </div>
+                    <div class="process-step fade-in-up" data-delay="400">
+                        <div class="step-number">04</div>
+                        <div class="step-content">
+                            <h4>Monitor & Improve</h4>
+                            <p>Track the implementation of recommendations and see real improvements in your farm's productivity.</p>
+                        </div>
+                        <div class="step-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Video Section -->
 <section class="video-section py-5">
     <div class="container">
         <div class="row align-items-center">
@@ -118,22 +293,156 @@
                         <li><i class="fas fa-check text-success"></i> Automated feed recommendations</li>
                         <li><i class="fas fa-check text-success"></i> Production optimization</li>
                         <li><i class="fas fa-check text-success"></i> Health alerts & monitoring</li>
+                        <li><i class="fas fa-check text-success"></i> Disease detection & prevention</li>
+                        <li><i class="fas fa-check text-success"></i> Multilingual support</li>
                     </ul>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="video-container fade-in-right">
-                    <video controls class="w-100 rounded-3 shadow-lg">
-                        <source src="{% static 'images/YTDown.com_YouTube_How-do-you-feed-your-cows-Do-you-know-wh_Media_x9RmGKYcVxw_001_1080p.mp4' %}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <div class="video-wrapper">
+                        <video controls class="w-100 rounded-3 shadow-lg">
+                            <source src="{% static 'images/YTDown.com_YouTube_How-do-you-feed-your-cows-Do-you-know-wh_Media_x9RmGKYcVxw_001_1080p.mp4' %}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="video-overlay">
+                            <button class="play-button">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <div class="section-header">
+                    <h2 class="section-title fade-in-up">What Farmers Say</h2>
+                    <p class="section-subtitle fade-in-up">Real results from dairy farmers using our platform</p>
+                    <div class="section-divider"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="testimonials-slider">
+                    <div class="testimonial-card fade-in-up" data-delay="100">
+                        <div class="testimonial-content">
+                            <div class="quote-icon">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <p>"Smart Dairy has transformed how I manage my farm. The AI recommendations have increased my milk production by 25% in just three months!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <img src="{% static 'images/farmer1.jpg' %}" alt="Farmer John">
+                                </div>
+                                <div class="author-info">
+                                    <h5>John Kamau</h5>
+                                    <span>Nakuru, Kenya</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card fade-in-up" data-delay="200">
+                        <div class="testimonial-content">
+                            <div class="quote-icon">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <p>"The disease detection feature saved my entire herd from a potential outbreak. Early warnings gave me time to isolate and treat affected cows."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <img src="{% static 'images/farmer2.jpg' %}" alt="Farmer Mary">
+                                </div>
+                                <div class="author-info">
+                                    <h5>Mary Wanjiku</h5>
+                                    <span>Kiambu, Kenya</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card fade-in-up" data-delay="300">
+                        <div class="testimonial-content">
+                            <div class="quote-icon">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <p>"As a small-scale farmer, I never thought I could afford such advanced technology. Smart Dairy has made AI accessible and practical for my operation."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">
+                                    <img src="{% static 'images/farmer3.jpg' %}" alt="Farmer David">
+                                </div>
+                                <div class="author-info">
+                                    <h5>David Ochieng</h5>
+                                    <span>Kisumu, Kenya</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chatbot Preview Section -->
+<section class="chatbot-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="chatbot-preview fade-in-left">
+                    <div class="chatbot-header">
+                        <div class="chatbot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="chatbot-info">
+                            <h5>Dairy Assistant</h5>
+                            <span>Online • Speaks Kiswahili & English</span>
+                        </div>
+                    </div>
+                    <div class="chatbot-messages">
+                        <div class="message bot-message">
+                            <p>Habari! I'm your Smart Dairy assistant. How can I help with your farm today?</p>
+                        </div>
+                        <div class="message user-message">
+                            <p>One of my cows has reduced milk production. What could be the issue?</p>
+                        </div>
+                        <div class="message bot-message">
+                            <p>Based on common issues, this could be due to nutrition, health, or environmental factors. Let me ask a few questions to help diagnose...</p>
+                        </div>
+                    </div>
+                    <div class="chatbot-input">
+                        <input type="text" placeholder="Type your message...">
+                        <button class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chatbot-content fade-in-right">
+                    <h3>Intelligent Dairy Assistant</h3>
+                    <p>Our multilingual chatbot provides instant expert advice for your dairy farming questions, available 24/7 in both English and Kiswahili.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check text-success"></i> Available in Kiswahili & English</li>
+                        <li><i class="fas fa-check text-success"></i> 24/7 instant responses</li>
+                        <li><i class="fas fa-check text-success"></i> Disease diagnosis support</li>
+                        <li><i class="fas fa-check text-success"></i> Feed optimization advice</li>
+                        <li><i class="fas fa-check text-success"></i> Production troubleshooting</li>
+                        <li><i class="fas fa-check text-success"></i> Best practices guidance</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary mt-3">Try the Chatbot</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced CTA Section -->
 <section class="cta-section py-5">
     <div class="container">
         <div class="row">
@@ -141,33 +450,109 @@
                 <div class="cta-content fade-in-up">
                     <h2>Ready to Transform Your Dairy Farm?</h2>
                     <p>Join hundreds of farmers who are already using AI to increase their milk production and profitability.</p>
-                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg pulse-btn">Get Started Today</a>
+                    <div class="cta-buttons">
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg pulse-btn">
+                            <span class="btn-content">
+                                <span class="btn-text">Get Started Today</span>
+                                <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                            </span>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-lg">
+                            <span class="btn-content">
+                                <span class="btn-text">Schedule a Demo</span>
+                                <span class="btn-icon"><i class="fas fa-calendar"></i></span>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="cta-footer">
+                        <p><i class="fas fa-shield-alt"></i> 14-day free trial • No credit card required</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="footer py-4">
+<!-- Enhanced Footer -->
+<footer class="footer py-5">
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
-                <p>&copy; 2024 Smart Dairy. All rights reserved.</p>
+            <div class="col-lg-4 mb-4">
+                <div class="footer-brand">
+                    <a href="#" class="navbar-brand">
+                        <i class="fas fa-cow"></i>
+                        <span>Smart Dairy</span>
+                    </a>
+                    <p class="footer-description">AI-powered solutions for modern dairy farming, helping farmers increase productivity and profitability.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6 text-end">
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h5>Product</h5>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h5>Resources</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h5>Company</h5>
+                <ul class="footer-links">
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Partners</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 mb-4">
+                <h5>Legal</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">GDPR</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Smart Dairy. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="footer-bottom-links">
+                        <a href="#">Privacy</a>
+                        <a href="#">Terms</a>
+                        <a href="#">Sitemap</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </footer>
 
+<!-- Back to Top Button -->
+<button id="backToTop" class="back-to-top">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
 <style>
-/* ===== VARIABLES ===== */
+/* ===== ENHANCED VARIABLES ===== */
 :root {
     --primary-blue: #1e3a8a;
     --secondary-blue: #3b82f6;
@@ -182,11 +567,13 @@
     --text-light: #6b7280;
     --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.2);
     --border-radius: 12px;
     --transition: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
 }
 
-/* ===== BASE STYLES ===== */
+/* ===== ENHANCED BASE STYLES ===== */
 * {
     margin: 0;
     padding: 0;
@@ -199,13 +586,14 @@ body {
     color: var(--text-dark);
     overflow-x: hidden;
     background-color: var(--white);
+    scroll-behavior: smooth;
 }
 
 html {
     scroll-behavior: smooth;
 }
 
-/* ===== NAVBAR ===== */
+/* ===== ENHANCED NAVBAR ===== */
 .navbar {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     padding: 1rem 0;
@@ -218,6 +606,26 @@ html {
     padding: 0.5rem 0;
     background: rgba(30, 58, 138, 0.95);
     backdrop-filter: blur(10px);
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.beta-badge {
+    position: absolute;
+    top: -8px;
+    right: -35px;
+    background: var(--primary-yellow);
+    color: var(--dark-gray);
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    text-transform: uppercase;
 }
 
 .navbar-brand {
@@ -290,6 +698,23 @@ html {
     box-shadow: var(--shadow);
 }
 
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background-color: var(--light-blue);
+    color: var(--primary-blue);
+}
+
 .navbar-toggler {
     border: none;
     padding: 0.25rem 0.5rem;
@@ -303,7 +728,7 @@ html {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* ===== HERO SECTION ===== */
+/* ===== ENHANCED HERO SECTION ===== */
 .hero-section {
     position: relative;
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
@@ -324,9 +749,81 @@ html {
     opacity: 0.3;
 }
 
+.floating-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 15s infinite linear;
+}
+
+.shape-1 {
+    width: 80px;
+    height: 80px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 120px;
+    height: 120px;
+    top: 20%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 60px;
+    height: 60px;
+    bottom: 20%;
+    left: 15%;
+    animation-delay: 4s;
+}
+
+.shape-4 {
+    width: 100px;
+    height: 100px;
+    bottom: 10%;
+    right: 20%;
+    animation-delay: 6s;
+}
+
+.shape-5 {
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    left: 5%;
+    animation-delay: 8s;
+}
+
 .hero-content {
     position: relative;
     z-index: 2;
+}
+
+.hero-badge {
+    margin-bottom: 1.5rem;
+}
+
+.badge-text {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .hero-title {
@@ -367,6 +864,20 @@ html {
     overflow: hidden;
 }
 
+.btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    transition: var(--transition);
+}
+
+.hero-buttons .btn:hover .btn-icon {
+    transform: translateX(5px);
+}
+
 .hero-buttons .btn-primary {
     background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
     border: none;
@@ -396,6 +907,10 @@ html {
     margin-top: 3rem;
 }
 
+.stat-container {
+    position: relative;
+}
+
 .stat-number {
     font-size: 2.5rem;
     font-weight: 800;
@@ -415,9 +930,84 @@ html {
     z-index: 2;
 }
 
+.image-container {
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
 .hero-image img {
     border: 5px solid rgba(255, 255, 255, 0.2);
     transition: var(--transition);
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 1.5rem;
+    color: var(--white);
+    transform: translateY(100%);
+    transition: var(--transition);
+}
+
+.image-container:hover .image-overlay {
+    transform: translateY(0);
+}
+
+.overlay-content h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.overlay-content p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.floating-cards {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.floating-card {
+    position: absolute;
+    background: var(--white);
+    color: var(--primary-blue);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: float 5s infinite ease-in-out;
+    z-index: 3;
+}
+
+.card-1 {
+    top: 10%;
+    right: -10%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    top: 40%;
+    left: -15%;
+    animation-delay: 1.5s;
+}
+
+.card-3 {
+    bottom: 20%;
+    right: -12%;
+    animation-delay: 3s;
 }
 
 .scroll-indicator {
@@ -426,6 +1016,15 @@ html {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
+    text-align: center;
+}
+
+.scroll-text {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .scroll-arrow {
@@ -435,9 +1034,10 @@ html {
     border-bottom: 3px solid var(--primary-yellow);
     transform: rotate(45deg);
     animation: scrollBounce 2s infinite;
+    margin: 0 auto;
 }
 
-/* ===== FEATURES SECTION ===== */
+/* ===== ENHANCED FEATURES SECTION ===== */
 .features-section {
     background-color: var(--light-gray);
     position: relative;
@@ -455,6 +1055,10 @@ html {
     opacity: 0.5;
 }
 
+.section-header {
+    position: relative;
+}
+
 .section-title {
     font-size: 2.5rem;
     font-weight: 700;
@@ -469,6 +1073,14 @@ html {
     margin: 0 auto;
 }
 
+.section-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    margin: 1.5rem auto;
+    border-radius: 2px;
+}
+
 .feature-card {
     background: var(--white);
     border-radius: var(--border-radius);
@@ -480,6 +1092,8 @@ html {
     position: relative;
     overflow: hidden;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .feature-card::before {
@@ -514,6 +1128,11 @@ html {
     justify-content: center;
     position: relative;
     z-index: 2;
+    transition: var(--transition);
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
 }
 
 .feature-icon i {
@@ -537,9 +1156,129 @@ html {
     color: var(--text-light);
     position: relative;
     z-index: 2;
+    flex-grow: 1;
 }
 
-/* ===== VIDEO SECTION ===== */
+.feature-footer {
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.feature-link {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.feature-link:hover {
+    color: var(--primary-blue);
+    gap: 0.75rem;
+}
+
+/* ===== HOW IT WORKS SECTION ===== */
+.how-it-works-section {
+    background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.process-steps {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.process-steps::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50px;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border-radius: 2px;
+    transform: translateX(-50%);
+}
+
+.process-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.step-number {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-right: 2rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow);
+}
+
+.step-content {
+    flex-grow: 1;
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.step-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background: var(--white);
+    transform: translateY(-50%) rotate(45deg);
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.step-content h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.step-content p {
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+.step-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--light-yellow);
+    color: var(--primary-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-left: 2rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+}
+
+/* ===== ENHANCED VIDEO SECTION ===== */
 .video-section {
     background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
     position: relative;
@@ -585,6 +1324,10 @@ html {
     transition: var(--transition);
 }
 
+.video-wrapper {
+    position: relative;
+}
+
 .video-container:hover {
     transform: scale(1.02);
 }
@@ -594,7 +1337,272 @@ html {
     transition: var(--transition);
 }
 
-/* ===== CTA SECTION ===== */
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: var(--transition);
+}
+
+.video-wrapper:hover .video-overlay {
+    opacity: 0;
+}
+
+.play-button {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-yellow);
+    color: var(--dark-gray);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.play-button:hover {
+    transform: scale(1.1);
+    background: var(--secondary-yellow);
+}
+
+/* ===== TESTIMONIALS SECTION ===== */
+.testimonials-section {
+    background-color: var(--light-gray);
+    position: relative;
+    overflow: hidden;
+}
+
+.testimonials-slider {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scrollbar-width: none;
+}
+
+.testimonials-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.testimonial-card {
+    min-width: 350px;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.testimonial-content {
+    position: relative;
+}
+
+.quote-icon {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 40px;
+    height: 40px;
+    background: var(--light-blue);
+    color: var(--primary-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.testimonial-content p {
+    font-style: italic;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.author-info h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+}
+
+.author-info span {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* ===== CHATBOT SECTION ===== */
+.chatbot-section {
+    background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.chatbot-preview {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chatbot-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-yellow);
+    color: var(--dark-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.chatbot-info h5 {
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.chatbot-info span {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.chatbot-messages {
+    padding: 1.5rem;
+    height: 300px;
+    overflow-y: auto;
+    background: var(--light-gray);
+}
+
+.message {
+    margin-bottom: 1rem;
+    max-width: 80%;
+}
+
+.bot-message {
+    align-self: flex-start;
+}
+
+.bot-message p {
+    background: var(--white);
+    padding: 1rem;
+    border-radius: 1rem 1rem 1rem 0;
+    box-shadow: var(--shadow);
+}
+
+.user-message {
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.user-message p {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 1rem;
+    border-radius: 1rem 1rem 0 1rem;
+}
+
+.chatbot-input {
+    display: flex;
+    padding: 1rem;
+    background: var(--white);
+    border-top: 1px solid var(--light-gray);
+}
+
+.chatbot-input input {
+    flex-grow: 1;
+    border: 1px solid var(--light-gray);
+    border-radius: 50px;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.chatbot-input input:focus {
+    border-color: var(--secondary-blue);
+}
+
+.send-button {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    transition: var(--transition);
+}
+
+.send-button:hover {
+    background: var(--secondary-blue);
+    transform: scale(1.05);
+}
+
+.chatbot-content h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+}
+
+.chatbot-content p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* ===== ENHANCED CTA SECTION ===== */
 .cta-section {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--white);
@@ -633,32 +1641,111 @@ html {
     margin-right: auto;
 }
 
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
 .cta-content .btn {
     border-radius: 50px;
     padding: 0.75rem 2.5rem;
     font-weight: 600;
     font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.cta-content .btn-primary {
     background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
     border: none;
     color: var(--dark-gray);
     box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
-    transition: var(--transition);
 }
 
-.cta-content .btn:hover {
+.cta-content .btn-primary:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(251, 191, 36, 0.5);
 }
 
-/* ===== FOOTER ===== */
+.cta-content .btn-outline-light {
+    border: 2px solid var(--white);
+    color: var(--white);
+    background: transparent;
+}
+
+.cta-content .btn-outline-light:hover {
+    background: var(--white);
+    color: var(--primary-blue);
+    transform: translateY(-3px);
+}
+
+.cta-footer {
+    margin-top: 1.5rem;
+}
+
+.cta-footer p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0;
+}
+
+.cta-footer i {
+    color: var(--primary-yellow);
+    margin-right: 0.5rem;
+}
+
+/* ===== ENHANCED FOOTER ===== */
 .footer {
     background-color: var(--dark-gray);
     color: var(--white);
 }
 
+.footer-brand {
+    margin-bottom: 2rem;
+}
+
+.footer-brand .navbar-brand {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: inline-flex;
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+}
+
+.footer h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--primary-yellow);
+}
+
 .social-links {
     display: flex;
-    justify-content: flex-end;
     gap: 1rem;
 }
 
@@ -680,7 +1767,63 @@ html {
     transform: translateY(-3px);
 }
 
-/* ===== ANIMATIONS ===== */
+.footer-bottom {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-end;
+}
+
+.footer-bottom-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.footer-bottom-links a:hover {
+    color: var(--primary-yellow);
+}
+
+/* ===== BACK TO TOP BUTTON ===== */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background: var(--secondary-blue);
+    transform: translateY(-5px);
+}
+
+/* ===== ENHANCED ANIMATIONS ===== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -752,6 +1895,18 @@ html {
 
 @keyframes float {
     0% {
+        transform: translateY(0px) translateX(0);
+    }
+    50% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    100% {
+        transform: translateY(0px) translateX(0);
+    }
+}
+
+@keyframes float-slow {
+    0% {
         transform: translateY(0px);
     }
     50% {
@@ -763,29 +1918,36 @@ html {
 }
 
 .fade-in-up {
-    animation: fadeInUp 1s ease-out;
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
 }
 
 .fade-in-right {
-    animation: fadeInRight 1s ease-out;
+    opacity: 0;
+    animation: fadeInRight 1s ease-out forwards;
 }
 
 .fade-in-left {
-    animation: fadeInLeft 1s ease-out;
+    opacity: 0;
+    animation: fadeInLeft 1s ease-out forwards;
 }
 
 .floating {
-    animation: float 5s ease-in-out infinite;
+    animation: float-slow 5s ease-in-out infinite;
 }
 
 .pulse-btn {
     animation: pulse 2s infinite;
 }
 
-/* ===== RESPONSIVE STYLES ===== */
+/* ===== ENHANCED RESPONSIVE STYLES ===== */
 @media (max-width: 1200px) {
     .hero-title {
         font-size: 3rem;
+    }
+    
+    .floating-card {
+        display: none;
     }
 }
 
@@ -811,6 +1973,34 @@ html {
     }
     
     .hero-image {
+        margin-top: 3rem;
+    }
+    
+    .process-steps::before {
+        display: none;
+    }
+    
+    .process-step {
+        flex-direction: column;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .step-number {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .step-content::before {
+        display: none;
+    }
+    
+    .step-icon {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+    
+    .chatbot-content {
         margin-top: 3rem;
     }
 }
@@ -846,6 +2036,19 @@ html {
     .footer .col-md-6.text-end {
         text-align: center !important;
     }
+    
+    .footer-bottom-links {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+    }
+    
+    .cta-buttons .btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 576px) {
@@ -872,9 +2075,21 @@ html {
     .cta-content p {
         font-size: 1rem;
     }
+    
+    .testimonial-card {
+        min-width: 280px;
+    }
+    
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
 }
 
-/* ===== UTILITY CLASSES ===== */
+/* ===== ENHANCED UTILITY CLASSES ===== */
 .text-center {
     text-align: center;
 }
@@ -933,7 +2148,7 @@ html {
     gap: 1.5rem !important;
 }
 
-/* ===== SCROLLBAR STYLING ===== */
+/* ===== ENHANCED SCROLLBAR STYLING ===== */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -953,16 +2168,33 @@ html {
 </style>
 
 <script>
-// JavaScript for animations and interactions
+// Enhanced JavaScript for animations and interactions
 document.addEventListener('DOMContentLoaded', function() {
     // Navbar scroll effect
     window.addEventListener('scroll', function() {
         const navbar = document.querySelector('.navbar');
+        const backToTop = document.getElementById('backToTop');
+        
         if (window.scrollY > 50) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
+        
+        // Show/hide back to top button
+        if (window.scrollY > 300) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    });
+
+    // Back to top functionality
+    document.getElementById('backToTop').addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
 
     // Counter animation for stats
@@ -981,6 +2213,31 @@ document.addEventListener('DOMContentLoaded', function() {
             counter.innerText = target;
         }
     };
+    
+    // Video play button functionality
+    const videoWrapper = document.querySelector('.video-wrapper');
+    const video = videoWrapper.querySelector('video');
+    const playButton = videoWrapper.querySelector('.play-button');
+    
+    playButton.addEventListener('click', function() {
+        if (video.paused) {
+            video.play();
+            videoWrapper.querySelector('.video-overlay').style.opacity = '0';
+        } else {
+            video.pause();
+            videoWrapper.querySelector('.video-overlay').style.opacity = '1';
+        }
+    });
+    
+    video.addEventListener('click', function() {
+        if (video.paused) {
+            video.play();
+            videoWrapper.querySelector('.video-overlay').style.opacity = '0';
+        } else {
+            video.pause();
+            videoWrapper.querySelector('.video-overlay').style.opacity = '1';
+        }
+    });
     
     // Intersection Observer for animations
     const observerOptions = {
@@ -1009,11 +2266,11 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
     
-    // Add delay to feature cards
-    const featureCards = document.querySelectorAll('.feature-card');
-    featureCards.forEach(card => {
-        const delay = card.getAttribute('data-delay') || 0;
-        card.style.animationDelay = `${delay}ms`;
+    // Add delay to feature cards and other elements
+    const animatedElements = document.querySelectorAll('.feature-card, .process-step, .testimonial-card');
+    animatedElements.forEach(element => {
+        const delay = element.getAttribute('data-delay') || 0;
+        element.style.animationDelay = `${delay}ms`;
     });
     
     // Smooth scrolling for anchor links
@@ -1027,6 +2284,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     block: 'start'
                 });
             }
+        });
+    });
+    
+    // Chatbot input simulation
+    const chatbotInput = document.querySelector('.chatbot-input input');
+    const sendButton = document.querySelector('.send-button');
+    
+    sendButton.addEventListener('click', function() {
+        if (chatbotInput.value.trim() !== '') {
+            // In a real implementation, this would send the message to the backend
+            // For now, we'll just clear the input
+            chatbotInput.value = '';
+        }
+    });
+    
+    chatbotInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && chatbotInput.value.trim() !== '') {
+            // In a real implementation, this would send the message to the backend
+            // For now, we'll just clear the input
+            chatbotInput.value = '';
+        }
+    });
+    
+    // Language dropdown functionality
+    const languageDropdown = document.getElementById('languageDropdown');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedLanguage = this.textContent;
+            languageDropdown.innerHTML = `<i class="fas fa-globe"></i> ${selectedLanguage}`;
         });
     });
 });

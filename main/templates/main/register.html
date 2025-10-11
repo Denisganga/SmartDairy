@@ -4,111 +4,857 @@
 {% block title %}Register - Smart Dairy{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card fade-in-up">
-        <div class="text-center mb-4">
-            <i class="fas fa-cow text-success" style="font-size: 3rem;"></i>
-            <h2>Join Smart Dairy</h2>
-            <p class="text-muted">Start your AI-powered dairy journey</p>
+<div class="register-container">
+    <div class="register-wrapper">
+        <!-- Image Section -->
+        <div class="register-image-section">
+            <div class="image-overlay"></div>
+            <img src="{% static 'images/dairy-farm-register.jpg' %}" alt="Smart Dairy Farming" class="register-image">
+            <div class="image-content">
+                <div class="logo-section">
+                    <i class="fas fa-cow"></i>
+                    <span>Smart Dairy</span>
+                </div>
+                <div class="image-text">
+                    <h2>Join the Future of Dairy Farming</h2>
+                    <p>Start your journey with AI-powered insights that transform your dairy operations</p>
+                </div>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-robot"></i>
+                        <span>AI-Powered Analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-stethoscope"></i>
+                        <span>Health Monitoring</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Production Optimization</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Multilingual Support</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <!-- Form Section -->
+        <div class="register-form-section">
+            <div class="auth-card fade-in-up">
+                <div class="form-header">
+                    <div class="header-icon">
+                        <i class="fas fa-cow"></i>
+                    </div>
+                    <h2>Create Your Account</h2>
+                    <p class="text-muted">Join thousands of farmers using AI to maximize their dairy production</p>
                 </div>
-            {% endfor %}
-        {% endif %}
 
-        <form method="post" class="needs-validation" novalidate>
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-                <div class="invalid-feedback">
-                    Please choose a username.
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-                <div class="invalid-feedback">
-                    Please provide a valid email.
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required minlength="6">
-                <div class="invalid-feedback">
-                    Password must be at least 6 characters long.
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                <div class="invalid-feedback">
-                    Please confirm your password.
-                </div>
-            </div>
-            
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="terms" required>
-                <label class="form-check-label" for="terms">
-                    I agree to the <a href="#" class="text-success">Terms of Service</a> and <a href="#" class="text-success">Privacy Policy</a>
-                </label>
-                <div class="invalid-feedback">
-                    You must agree before submitting.
-                </div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-user-plus me-2"></i>Create Account
-            </button>
-        </form>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <div class="alert-content">
+                                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-        <div class="text-center mt-4">
-            <p class="text-muted">Already have an account? 
-                <a href="{% url 'login' %}" class="text-success text-decoration-none fw-bold">Sign in here</a>
-            </p>
-            <a href="{% url 'landing' %}" class="text-muted text-decoration-none">
-                <i class="fas fa-arrow-left me-1"></i>Back to Home
-            </a>
+                <form method="post" class="needs-validation" novalidate id="registerForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-grid">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-1"></i>Username
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" required 
+                                   placeholder="Enter your username">
+                            <div class="invalid-feedback">
+                                Please choose a username.
+                            </div>
+                            <div class="form-text">This will be your unique identifier</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-1"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" required 
+                                   placeholder="Enter your email">
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Password
+                            </label>
+                            <div class="password-input-group">
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       required minlength="6" placeholder="Create a password">
+                                <button type="button" class="password-toggle" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Password must be at least 6 characters long.
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <small class="strength-text" id="strengthText">Password strength</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Confirm Password
+                            </label>
+                            <div class="password-input-group">
+                                <input type="password" class="form-control" id="confirm_password" 
+                                       name="confirm_password" required placeholder="Confirm your password">
+                                <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="confirmPasswordFeedback">
+                                Please confirm your password.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="farm_name" class="form-label">
+                            <i class="fas fa-tractor me-1"></i>Farm Name (Optional)
+                        </label>
+                        <input type="text" class="form-control" id="farm_name" name="farm_name" 
+                               placeholder="Enter your farm name">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                        </label>
+                        <div class="invalid-feedback">
+                            You must agree to the terms before submitting.
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="newsletter" checked>
+                        <label class="form-check-label" for="newsletter">
+                            Send me updates about new features and dairy farming tips
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2" id="submitBtn">
+                        <span class="btn-content">
+                            <i class="fas fa-user-plus me-2"></i>
+                            <span class="btn-text">Create Account</span>
+                        </span>
+                        <div class="btn-loading d-none">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Creating Account...
+                        </div>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>or continue with</span>
+                </div>
+
+                <div class="social-buttons">
+                    <button type="button" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="fab fa-google me-2"></i>Google
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary w-100">
+                        <i class="fab fa-facebook me-2"></i>Facebook
+                    </button>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">Already have an account? 
+                        <a href="{% url 'login' %}" class="text-primary text-decoration-none fw-bold">Sign in here</a>
+                    </p>
+                    <a href="{% url 'landing' %}" class="text-muted text-decoration-none small">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Home
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-// Bootstrap form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-})();
+<style>
+/* ===== REGISTER PAGE STYLES ===== */
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #3b82f6;
+    --light-blue: #dbeafe;
+    --primary-yellow: #fbbf24;
+    --secondary-yellow: #fcd34d;
+    --light-yellow: #fef3c7;
+    --white: #ffffff;
+    --light-gray: #f8fafc;
+    --dark-gray: #1f2937;
+    --text-dark: #374151;
+    --text-light: #6b7280;
+    --border-color: #e5e7eb;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
 
-// Password confirmation validation
-document.getElementById('confirm_password').addEventListener('input', function() {
-    const password = document.getElementById('password').value;
-    const confirmPassword = this.value;
-    
-    if (password !== confirmPassword) {
-        this.setCustomValidity('Passwords do not match');
-    } else {
-        this.setCustomValidity('');
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.register-wrapper {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    min-height: 800px;
+}
+
+/* Image Section */
+.register-image-section {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.register-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.8) 0%, rgba(59, 130, 246, 0.8) 100%);
+    border-radius: var(--border-radius);
+}
+
+.image-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--white);
+    z-index: 2;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.logo-section i {
+    color: var(--primary-yellow);
+    font-size: 2rem;
+}
+
+.image-text h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.image-text p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 400px;
+}
+
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.feature-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+}
+
+.feature-item i {
+    color: var(--primary-yellow);
+    font-size: 1.2rem;
+    width: 20px;
+}
+
+.feature-item span {
+    font-weight: 500;
+}
+
+/* Form Section */
+.register-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: var(--white);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--light-yellow) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.header-icon i {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+}
+
+/* Form Styles */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    color: var(--secondary-blue);
+    width: 16px;
+}
+
+.form-control {
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+/* Password Input Group */
+.password-input-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.password-toggle:hover {
+    color: var(--secondary-blue);
+}
+
+/* Password Strength */
+.password-strength {
+    display: none;
+}
+
+.password-strength.show {
+    display: block;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: var(--transition);
+}
+
+.strength-fill.weak {
+    width: 33%;
+    background: #dc3545;
+}
+
+.strength-fill.medium {
+    width: 66%;
+    background: #ffc107;
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: #198754;
+}
+
+.strength-text {
+    color: var(--text-light);
+    font-size: 0.75rem;
+}
+
+/* Checkboxes */
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-input {
+    width: 1.1em;
+    height: 1.1em;
+    margin-top: 0.15em;
+    margin-right: 0.5em;
+}
+
+.form-check-input:checked {
+    background-color: var(--secondary-blue);
+    border-color: var(--secondary-blue);
+}
+
+.form-check-input:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.form-check-label {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.form-check-label a {
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Submit Button */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-content, .btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-loading .spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Divider */
+.divider {
+    text-align: center;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    background: var(--white);
+    padding: 0 1rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Social Buttons */
+.social-buttons .btn {
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.social-buttons .btn:hover {
+    border-color: var(--secondary-blue);
+    background: var(--light-blue);
+    transform: translateY(-1px);
+}
+
+/* Links */
+.text-primary {
+    color: var(--secondary-blue) !important;
+}
+
+.text-primary:hover {
+    color: var(--primary-blue) !important;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .register-wrapper {
+        flex-direction: column;
+        min-height: auto;
+    }
+    
+    .register-image-section {
+        min-height: 400px;
+    }
+    
+    .image-content {
+        padding: 2rem;
+    }
+    
+    .image-text h2 {
+        font-size: 2rem;
+    }
+    
+    .register-form-section {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .register-container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .register-form-section {
+        padding: 1.5rem;
+    }
+    
+    .image-content {
+        padding: 1.5rem;
+    }
+    
+    .image-text h2 {
+        font-size: 1.75rem;
+    }
+    
+    .feature-item {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-header h2 {
+        font-size: 1.75rem;
+    }
+    
+    .header-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .header-icon i {
+        font-size: 2rem;
+    }
+    
+    .logo-section {
+        font-size: 1.25rem;
+    }
+    
+    .logo-section i {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+    
+    toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordInput.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+    
+    // Password strength indicator
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const passwordStrength = document.querySelector('.password-strength');
+        
+        if (password.length > 0) {
+            passwordStrength.classList.add('show');
+            
+            let strength = 0;
+            let text = 'Weak';
+            
+            if (password.length >= 6) strength += 1;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+            if (password.match(/\d/)) strength += 1;
+            if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+            
+            if (strength <= 1) {
+                strengthFill.className = 'strength-fill weak';
+                text = 'Weak';
+            } else if (strength <= 3) {
+                strengthFill.className = 'strength-fill medium';
+                text = 'Medium';
+            } else {
+                strengthFill.className = 'strength-fill strong';
+                text = 'Strong';
+            }
+            
+            strengthText.textContent = text;
+        } else {
+            passwordStrength.classList.remove('show');
+        }
+    });
+    
+    // Password confirmation validation
+    confirmPasswordInput.addEventListener('input', function() {
+        const password = passwordInput.value;
+        const confirmPassword = this.value;
+        const feedback = document.getElementById('confirmPasswordFeedback');
+        
+        if (password !== confirmPassword && confirmPassword.length > 0) {
+            this.setCustomValidity('Passwords do not match');
+            feedback.textContent = 'Passwords do not match';
+        } else {
+            this.setCustomValidity('');
+            feedback.textContent = 'Please confirm your password.';
+        }
+    });
+    
+    // Form submission with loading state
+    const registerForm = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnContent = submitBtn.querySelector('.btn-content');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+    
+    registerForm.addEventListener('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('was-validated');
+            return;
+        }
+        
+        // Show loading state
+        btnContent.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        submitBtn.disabled = true;
+        
+        // Simulate form submission (remove in production)
+        setTimeout(() => {
+            btnContent.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            submitBtn.disabled = false;
+        }, 2000);
+    });
+    
+    // Real-time validation
+    const inputs = registerForm.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            this.checkValidity();
+        });
+    });
+    
+    // Bootstrap form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
 });
 </script>
 {% endblock %}
