@@ -49,6 +49,70 @@
                 </div>
             </div>
 
+            <!-- Special Conditions Section -->
+            <div class="card special-conditions-card mb-4">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Special Conditions & Life Stages</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Select any special conditions that apply to {{ cow.name }} for more precise nutrition planning:</p>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('pregnant')">
+                                <i class="fas fa-baby text-pink"></i>
+                                <h6>Pregnant</h6>
+                                <p>Expecting calf</p>
+                                <div class="condition-indicator" id="pregnant-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('lactating')">
+                                <i class="fas fa-tint text-info"></i>
+                                <h6>Lactating</h6>
+                                <p>Currently milking</p>
+                                <div class="condition-indicator" id="lactating-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('dry')">
+                                <i class="fas fa-pause text-warning"></i>
+                                <h6>Dry Period</h6>
+                                <p>Rest before calving</p>
+                                <div class="condition-indicator" id="dry-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('first-calf')">
+                                <i class="fas fa-seedling text-success"></i>
+                                <h6>First Calf Heifer</h6>
+                                <p>First pregnancy</p>
+                                <div class="condition-indicator" id="first-calf-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('high-producer')">
+                                <i class="fas fa-trophy text-gold"></i>
+                                <h6>High Producer</h6>
+                                <p>Above average milk</p>
+                                <div class="condition-indicator" id="high-producer-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="condition-card" onclick="toggleCondition('recovering')">
+                                <i class="fas fa-heart text-danger"></i>
+                                <h6>Recovering</h6>
+                                <p>Post-illness care</p>
+                                <div class="condition-indicator" id="recovering-indicator"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selected-conditions mt-3" id="selectedConditions" style="display: none;">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>Selected Conditions:</h6>
+                        <div id="conditionsList" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Feed Generation Section -->
             <div class="card feed-generation-card">
                 <div class="card-header bg-gradient-primary text-white text-center">
@@ -70,7 +134,7 @@
                                 <div class="spinner-grow text-success me-2" style="width: 3rem; height: 3rem; animation-delay: 0.3s;"></div>
                                 <div class="spinner-grow text-info" style="width: 3rem; height: 3rem; animation-delay: 0.6s;"></div>
                             </div>
-                            <h4 class="text-primary mb-3">🧠 Gemini AI Analyzing {{ cow.name }}...</h4>
+                            <h4 class="text-primary mb-3">🧠 Smart AI Analyzing {{ cow.name }}...</h4>
                             <p class="text-muted">Considering breed characteristics, age, weight, and health condition</p>
                             <div class="progress" style="height: 8px;">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
@@ -90,6 +154,100 @@
 </div>
 
 <style>
+/* Special Conditions Styling */
+.special-conditions-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.condition-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.condition-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: #667eea;
+}
+
+.condition-card.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-3px);
+}
+
+.condition-card i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.condition-card h6 {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.condition-card p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    opacity: 0.8;
+}
+
+.condition-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #28a745;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.condition-card.selected .condition-indicator {
+    opacity: 1;
+}
+
+.text-pink {
+    color: #e91e63 !important;
+}
+
+.text-gold {
+    color: #ffc107 !important;
+}
+
+.selected-conditions {
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.condition-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
 /* Profile Card Styling */
 .profile-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -231,6 +389,47 @@
 </style>
 
 <script>
+let selectedConditions = [];
+
+function toggleCondition(condition) {
+    const card = document.querySelector(`[onclick="toggleCondition('${condition}')"]`);
+    const index = selectedConditions.indexOf(condition);
+    
+    if (index > -1) {
+        // Remove condition
+        selectedConditions.splice(index, 1);
+        card.classList.remove('selected');
+    } else {
+        // Add condition
+        selectedConditions.push(condition);
+        card.classList.add('selected');
+    }
+    
+    updateSelectedConditionsDisplay();
+}
+
+function updateSelectedConditionsDisplay() {
+    const container = document.getElementById('selectedConditions');
+    const list = document.getElementById('conditionsList');
+    
+    if (selectedConditions.length > 0) {
+        container.style.display = 'block';
+        list.innerHTML = selectedConditions.map(condition => {
+            const labels = {
+                'pregnant': '🤱 Pregnant',
+                'lactating': '🥛 Lactating', 
+                'dry': '⏸️ Dry Period',
+                'first-calf': '🌱 First Calf Heifer',
+                'high-producer': '🏆 High Producer',
+                'recovering': '❤️ Recovering'
+            };
+            return `<span class="condition-badge">${labels[condition]}</span>`;
+        }).join('');
+    } else {
+        container.style.display = 'none';
+    }
+}
+
 function generatePersonalizedFeed() {
     // Hide generate button and show loading
     document.querySelector('.generate-btn').style.display = 'none';
@@ -251,7 +450,8 @@ function generatePersonalizedFeed() {
                 breed: '{{ cow.breed }}',
                 age: {{ cow.age }},
                 weight: {{ cow.weight|default:400 }},
-                health_condition: '{{ cow.health_condition|default:"good" }}'
+                health_condition: '{{ cow.health_condition|default:"good" }}',
+                special_conditions: selectedConditions
             }
         })
     })
@@ -313,7 +513,7 @@ function displayFeedPlan(data) {
                         <h6><i class="fas fa-brain text-primary me-2"></i>AI Analysis for {{ cow.name }}</h6>
                         <p>${data.ai_explanation}</p>
                         <div class="text-muted small mt-2">
-                            <i class="fas fa-robot me-1"></i>Generated by Gemini AI based on {{ cow.name }}'s profile
+                            <i class="fas fa-robot me-1"></i>Generated by Smart AI based on {{ cow.name }}'s profile
                         </div>
                     </div>
                 </div>

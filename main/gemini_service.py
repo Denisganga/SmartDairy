@@ -710,6 +710,9 @@ class AIService:
             return self._get_calculated_feed_plan(cow_profile)
     
     def _build_personalized_feed_plan_prompt(self, cow_profile, language='en'):
+        special_conditions = cow_profile.get('special_conditions', [])
+        conditions_text = ", ".join(special_conditions) if special_conditions else "none"
+        
         return f"""
         As a dairy nutrition expert, create a highly personalized feed plan for this specific cow:
         
@@ -719,16 +722,17 @@ class AIService:
         - Age: {cow_profile.get('age', 24)} months (Growth stage considerations)
         - Weight: {cow_profile.get('weight', 400)} kg (Body mass requirements)
         - Health: {cow_profile.get('health_condition', 'good')} (Health-adjusted nutrition)
+        - Special Conditions: {conditions_text} (Critical for nutrition adjustments)
         
-        Provide SPECIFIC feed quantities and detailed explanation:
+        Provide SPECIFIC feed quantities considering ALL factors especially special conditions:
         
-        PROTEIN: [exact kg amount] - [why this amount for THIS cow]
-        SILAGE: [exact kg amount] - [why this amount for THIS cow]  
-        MINERALS: [exact kg amount] - [why this amount for THIS cow]
+        PROTEIN: [exact kg amount] - [why this amount for THIS cow with these conditions]
+        SILAGE: [exact kg amount] - [why this amount for THIS cow with these conditions]  
+        MINERALS: [exact kg amount] - [why this amount for THIS cow with these conditions]
         
-        EXPLANATION: Write a detailed paragraph explaining why these specific amounts are perfect for {cow_profile.get('name', 'this cow')}, mentioning the breed characteristics, age requirements, weight considerations, and health status. Be specific about how each factor influences the nutrition plan.
+        EXPLANATION: Write a detailed paragraph explaining why these specific amounts are perfect for {cow_profile.get('name', 'this cow')}, mentioning the breed characteristics, age requirements, weight considerations, health status, and ESPECIALLY how the special conditions ({conditions_text}) influence the nutrition plan. Be specific about how each factor influences the nutrition plan.
         
-        Make it personal and specific to THIS individual cow, not generic advice.
+        Make it personal and specific to THIS individual cow with these exact conditions.
         """
     
     def _parse_feed_plan_response(self, response_text, cow_profile):
@@ -755,12 +759,13 @@ class AIService:
             return self._get_calculated_feed_plan(cow_profile)
     
     def _get_calculated_feed_plan(self, cow_profile):
-        """Calculate feed plan based on cow characteristics"""
+        """Calculate feed plan based on cow characteristics and special conditions"""
         age = cow_profile.get('age', 24)
         weight = cow_profile.get('weight', 400)
         breed = cow_profile.get('breed', 'Unknown')
         health = cow_profile.get('health_condition', 'good')
         name = cow_profile.get('name', 'this cow')
+        special_conditions = cow_profile.get('special_conditions', [])
         
         # Health multipliers
         health_multiplier = {
@@ -769,6 +774,29 @@ class AIService:
             'lactating': 1.3, 'recovering': 0.85
         }.get(health, 1.0)
         
+        # Special condition multipliers
+        condition_multiplier = 1.0
+        condition_notes = []
+        
+        if 'pregnant' in special_conditions:
+            condition_multiplier *= 1.25
+            condition_notes.append("increased nutrition for fetal development")
+        if 'lactating' in special_conditions:
+            condition_multiplier *= 1.4
+            condition_notes.append("high energy needs for milk production")
+        if 'dry' in special_conditions:
+            condition_multiplier *= 0.8
+            condition_notes.append("reduced feed during dry period")
+        if 'first-calf' in special_conditions:
+            condition_multiplier *= 1.15
+            condition_notes.append("extra nutrition for growth and first pregnancy")
+        if 'high-producer' in special_conditions:
+            condition_multiplier *= 1.3
+            condition_notes.append("enhanced nutrition for superior milk yield")
+        if 'recovering' in special_conditions:
+            condition_multiplier *= 0.9
+            condition_notes.append("gentle nutrition during recovery")
+        
         # Breed-specific adjustments
         breed_multiplier = {
             'Holstein': 1.1, 'Jersey': 0.9, 'Friesian': 1.05,
@@ -776,9 +804,10 @@ class AIService:
         }.get(breed, 1.0)
         
         # Calculate base requirements
-        base_protein = (weight * 0.006 + age * 0.02) * health_multiplier * breed_multiplier
-        base_silage = (weight * 0.04 + age * 0.1) * health_multiplier * breed_multiplier
-        base_minerals = (weight * 0.0008) * health_multiplier
+        total_multiplier = health_multiplier * breed_multiplier * condition_multiplier
+        base_protein = (weight * 0.006 + age * 0.02) * total_multiplier
+        base_silage = (weight * 0.04 + age * 0.1) * total_multiplier
+        base_minerals = (weight * 0.0008) * total_multiplier
         
         quantities = {
             'protein': f"{base_protein:.1f}",
@@ -786,12 +815,32 @@ class AIService:
             'minerals': f"{base_minerals:.2f}"
         }
         
-        explanation = self._generate_explanation(cow_profile, quantities)
+        explanation = self._generate_enhanced_explanation(cow_profile, quantities, condition_notes)
         
         return {
             'quantities': quantities,
             'explanation': explanation
         }
+    
+    def _generate_enhanced_explanation(self, cow_profile, quantities, condition_notes):
+        name = cow_profile.get('name', 'this cow')
+        breed = cow_profile.get('breed', 'Unknown')
+        age = cow_profile.get('age', 24)
+        weight = cow_profile.get('weight', 400)
+        health = cow_profile.get('health_condition', 'good')
+        special_conditions = cow_profile.get('special_conditions', [])
+        
+        base_explanation = f"This personalized feed plan for {name} is specifically designed considering her {breed} breed characteristics, {age}-month age, {weight}kg body weight, and {health} health condition."
+        
+        if special_conditions:
+            conditions_text = ", ".join([c.replace('-', ' ').title() for c in special_conditions])
+            special_explanation = f" Additionally, {name}'s special conditions ({conditions_text}) require specific nutritional adjustments: {', '.join(condition_notes)}."
+        else:
+            special_explanation = ""
+        
+        feed_explanation = f" The {quantities['protein']}kg protein provides optimal growth and production support, {quantities['silage']}kg silage ensures proper digestion and fiber intake, while {quantities['minerals']}kg minerals maintain strong bones and metabolic functions."
+        
+        return base_explanation + special_explanation + feed_explanation
     
     def _calculate_protein(self, cow_profile):
         weight = cow_profile.get('weight', 400)
