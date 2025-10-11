@@ -43,17 +43,27 @@ class AIService:
     
     def chat_response(self, message, language='en'):
         try:
+            print(f"Attempting to generate response for: {message}")
+            
             # Simple test prompt
             simple_prompt = f"Answer this farming question briefly: {message}"
-            response = self.model.generate_content(simple_prompt)
+            print(f"Using prompt: {simple_prompt}")
             
-            if response and response.text:
+            response = self.model.generate_content(simple_prompt)
+            print(f"Raw response: {response}")
+            
+            if response and hasattr(response, 'text') and response.text:
+                print(f"Response text: {response.text}")
                 return response.text.strip()
             else:
+                print("No valid response text found")
                 return "No response generated"
                 
         except Exception as e:
-            print(f"Chat error: {str(e)}")
+            print(f"Chat error details: {type(e).__name__}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            
             # Return working response
             if language == 'sw':
                 return f"Nimepokea swali lako kuhusu {message}. Hii ni jibu la msingi."
