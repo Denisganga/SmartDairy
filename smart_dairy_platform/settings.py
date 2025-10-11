@@ -124,7 +124,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # AI API Configuration
-AI_API_KEY = "AIzaSyB-i15V7GTDkq-l7tPEJzVEe7Xce9jNXnc"
+AI_API_KEY = "AIzaSyARjxW3hmPw5II1uxmjSOPABxaEKpT5ArU"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
