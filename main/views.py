@@ -516,11 +516,16 @@ def get_health_insights_api(request):
             health_condition = data.get('health_condition')
             cow_details = data.get('cow_details', {})
             
+            print(f"Getting insights for cow {cow_id}, condition: {health_condition}")
+            print(f"Cow details: {cow_details}")
+            
             cow = get_object_or_404(Cow, id=cow_id, owner=request.user)
             
             # Get AI insights using Gemini
             ai_service = AIService()
             insights = ai_service.get_health_insights(cow_details, health_condition)
+            
+            print(f"Generated insights: {insights}")
             
             return JsonResponse({
                 'success': True,
@@ -528,6 +533,9 @@ def get_health_insights_api(request):
             })
             
         except Exception as e:
+            print(f"Error in health insights API: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return JsonResponse({
                 'success': False,
                 'error': str(e)

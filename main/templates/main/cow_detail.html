@@ -28,7 +28,7 @@
                                 <span class="badge bg-primary me-2">{{ cow.breed }}</span>
                                 <span class="badge bg-secondary me-2">Tag: {{ cow.tag_number }}</span>
                                 <span class="badge bg-info me-2">{{ cow.age }} months old</span>
-                                <span class="badge bg-success" id="healthBadge">{{ cow.health_condition|title }}</span>
+                                <span class="badge bg-success" id="healthBadge">{{ cow.health_condition|default:"good"|title }}</span>
                             </div>
                             
                             <!-- Dynamic Health Condition Manager -->
@@ -1187,12 +1187,14 @@ function saveMilk(recordId) {
 }
 </script>
 {% endblock %}
-let currentHealthCondition = '{{ cow.health_condition }}';
+let currentHealthCondition = '{{ cow.health_condition|default:"good" }}';
 
 function applyHealthCondition() {
     const selectedCondition = document.getElementById('newHealthCondition').value;
     const customCondition = document.getElementById('customCondition').value.trim();
     const finalCondition = customCondition || selectedCondition;
+    
+    console.log('Applying health condition:', finalCondition);
     
     // Update UI with animation
     updateHealthBadge(finalCondition);
@@ -1202,6 +1204,78 @@ function applyHealthCondition() {
     
     // Update backend
     updateHealthConditionBackend(finalCondition);
+}
+
+function getAIHealthInsights(condition) {
+    const panel = document.getElementById('aiInsightsPanel');
+    const content = document.getElementById('aiInsightsContent');
+    
+    console.log('Getting AI insights for:', condition);
+    
+    // Show panel with enhanced loading animation
+    panel.style.display = 'block';
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="loading-container mb-3">
+                <div class="spinner-grow text-primary me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow text-success me-2" role="status" style="animation-delay: 0.2s;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow text-info" role="status" style="animation-delay: 0.4s;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <h5 class="text-primary">🧠 Gemini AI is Analyzing...</h5>
+            <p class="text-muted">Generating personalized insights for <strong>${condition}</strong> condition</p>
+            <div class="progress mt-3" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                     role="progressbar" style="width: 100%"></div>
+            </div>
+        </div>
+    `;
+    
+    // Call AI service
+    fetch('/api/get-health-insights/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            cow_id: {{ cow.id }},
+            health_condition: condition,
+            cow_details: {
+                name: '{{ cow.name }}',
+                breed: '{{ cow.breed }}',
+                age: {{ cow.age }},
+                weight: {{ cow.weight|default:400 }}
+            }
+        })
+    })
+    .then(response => {
+        console.log('API Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('API Response data:', data);
+        // Add delay for smooth transition
+        setTimeout(() => {
+            if (data.success) {
+                displayFormattedInsights(data.insights, condition);
+            } else {
+                console.error('API Error:', data.error);
+                displayFallbackInsights(condition);
+            }
+        }, 2000); // 2 second delay to show loading animation
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        setTimeout(() => {
+            displayFallbackInsights(condition);
+        }, 2000);
+    });
 }
 
 function updateHealthBadge(condition) {
@@ -1402,6 +1476,41 @@ function updateHealthConditionBackend(condition) {
     })
     .catch(error => console.error('Error updating health condition:', error));
 }
+/* Enhanced Loading Animations */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner-grow {
+    animation-duration: 1.5s;
+}
+
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    0% { background-position: 1rem 0; }
+    100% { background-position: 0 0; }
+}
+
+/* Pulse animation for loading text */
+.text-primary {
+    animation: pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 /* Health Manager Styling */
 .health-manager {
     border: none;
