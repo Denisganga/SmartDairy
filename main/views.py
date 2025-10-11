@@ -304,6 +304,29 @@ def analyze_disease_api(request):
         ai_service = AIService()
         analysis = ai_service.analyze_disease_photo(image_file, language)
         
+        # Add veterinary contact information if disease is detected
+        if analysis.get('disease_detected', False):
+            if language == 'sw':
+                analysis['veterinary_info'] = {
+                    'message': 'Wasiliana na daktari wa wanyamapori haraka!',
+                    'emergency_contacts': [
+                        {'name': 'Huduma za Dharura za Wanyamapori', 'phone': '0800-VETCARE'},
+                        {'name': 'Shirikisho la Madaktari wa Wanyamapori Kenya', 'phone': '020-2713378'},
+                        {'name': 'Huduma za Kilimo - Veterinary', 'phone': '0800-221111'}
+                    ],
+                    'advice': 'Usisubiri - piga simu sasa au tembelea kituo cha karibu cha veterinary'
+                }
+            else:
+                analysis['veterinary_info'] = {
+                    'message': 'Contact a veterinarian immediately!',
+                    'emergency_contacts': [
+                        {'name': 'Emergency Veterinary Services', 'phone': '0800-VETCARE'},
+                        {'name': 'Kenya Veterinary Association', 'phone': '020-2713378'},
+                        {'name': 'Agricultural Services - Veterinary', 'phone': '0800-221111'}
+                    ],
+                    'advice': 'Do not wait - call now or visit the nearest veterinary clinic'
+                }
+        
         return JsonResponse({
             'success': True,
             'analysis': analysis,

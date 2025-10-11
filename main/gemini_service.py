@@ -115,10 +115,11 @@ class AIService:
             Kama ni ng'ombe, chunguza kwa makini na ujibu:
             UGONJWA: [Kama unaona ugonjwa wowote, taja jina lake kama mastitis, lameness, bloat. Kama hakuna ugonjwa, sema "Hakuna ugonjwa unaonekana"]
             DALILI: [Orodhesha dalili zote unazoziona au sema "Hakuna dalili za ugonjwa"]
-            MATIBABU: [Pendekeza matibabu au sema "Hakuna matibabu yanahitajika"]
+            MATIBABU: [Kama umeona ugonjwa, sema "Wasiliana na daktari wa wanyamapori haraka". Kama hakuna ugonjwa, sema "Hakuna matibabu yanahitajika"]
             KUZUIA: [Njia za kuzuia au sema "Endelea na utunzaji wa kawaida"]
-            HARAKA: [Muhimu/Wastani/Chini au "Hakuna"]
+            HARAKA: [Kama umeona ugonjwa, sema "Muhimu - piga simu daktari sasa". Kama hakuna, sema "Hakuna"]
             
+            MUHIMU: Kama umeona ugonjwa wowote, mzarizi anapaswa kuwasiliana na daktari wa wanyamapori haraka.
             Jibu kwa Kiswahili tu.
             """
         else:
@@ -132,10 +133,11 @@ class AIService:
             If it IS a cow, carefully examine and respond:
             DISEASE: [If you see any disease, name it specifically like mastitis, lameness, bloat, etc. If no disease visible, say "No disease visible"]
             SYMPTOMS: [List visible symptoms or say "No disease symptoms visible"]
-            TREATMENT: [Recommend treatment or say "No treatment needed"]
+            TREATMENT: [If disease detected, say "Contact veterinarian immediately". If no disease, say "No treatment needed"]
             PREVENTION: [Prevention methods or say "Continue normal care"]
-            URGENCY: [Critical/Medium/Low or "None"]
+            URGENCY: [If disease detected, say "Critical - call veterinarian now". If no disease, say "None"]
             
+            IMPORTANT: If any disease is detected, the farmer should contact a veterinarian immediately.
             Answer in English only. Be accurate - only report diseases if you actually see them.
             """
     
