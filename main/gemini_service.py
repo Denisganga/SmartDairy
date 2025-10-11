@@ -694,3 +694,124 @@ class AIService:
     
     def _get_default_recommendation_text(self, condition):
         return f"Continue monitoring and maintain appropriate care for {condition} condition."
+    def generate_personalized_feed_plan(self, cow_profile, language='en'):
+        """Generate highly personalized feed plan using Gemini AI"""
+        try:
+            prompt = self._build_personalized_feed_plan_prompt(cow_profile, language)
+            response = self.model.generate_content(prompt)
+            
+            if response and hasattr(response, 'text') and response.text:
+                return self._parse_feed_plan_response(response.text, cow_profile)
+            else:
+                return self._get_calculated_feed_plan(cow_profile)
+                
+        except Exception as e:
+            print(f"Personalized feed plan error: {e}")
+            return self._get_calculated_feed_plan(cow_profile)
+    
+    def _build_personalized_feed_plan_prompt(self, cow_profile, language='en'):
+        return f"""
+        As a dairy nutrition expert, create a highly personalized feed plan for this specific cow:
+        
+        COW PROFILE:
+        - Name: {cow_profile.get('name', 'Unknown')}
+        - Breed: {cow_profile.get('breed', 'Unknown')} (Consider breed-specific nutritional needs)
+        - Age: {cow_profile.get('age', 24)} months (Growth stage considerations)
+        - Weight: {cow_profile.get('weight', 400)} kg (Body mass requirements)
+        - Health: {cow_profile.get('health_condition', 'good')} (Health-adjusted nutrition)
+        
+        Provide SPECIFIC feed quantities and detailed explanation:
+        
+        PROTEIN: [exact kg amount] - [why this amount for THIS cow]
+        SILAGE: [exact kg amount] - [why this amount for THIS cow]  
+        MINERALS: [exact kg amount] - [why this amount for THIS cow]
+        
+        EXPLANATION: Write a detailed paragraph explaining why these specific amounts are perfect for {cow_profile.get('name', 'this cow')}, mentioning the breed characteristics, age requirements, weight considerations, and health status. Be specific about how each factor influences the nutrition plan.
+        
+        Make it personal and specific to THIS individual cow, not generic advice.
+        """
+    
+    def _parse_feed_plan_response(self, response_text, cow_profile):
+        """Parse AI response into structured feed plan"""
+        try:
+            protein_match = re.search(r'PROTEIN:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            silage_match = re.search(r'SILAGE:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            minerals_match = re.search(r'MINERALS:\s*(\d+\.?\d*)', response_text, re.IGNORECASE)
+            explanation_match = re.search(r'EXPLANATION:\s*(.*?)(?:\n\n|$)', response_text, re.IGNORECASE | re.DOTALL)
+            
+            quantities = {
+                'protein': protein_match.group(1) if protein_match else self._calculate_protein(cow_profile),
+                'silage': silage_match.group(1) if silage_match else self._calculate_silage(cow_profile),
+                'minerals': minerals_match.group(1) if minerals_match else self._calculate_minerals(cow_profile)
+            }
+            
+            explanation = explanation_match.group(1).strip() if explanation_match else self._generate_explanation(cow_profile, quantities)
+            
+            return {
+                'quantities': quantities,
+                'explanation': explanation
+            }
+        except:
+            return self._get_calculated_feed_plan(cow_profile)
+    
+    def _get_calculated_feed_plan(self, cow_profile):
+        """Calculate feed plan based on cow characteristics"""
+        age = cow_profile.get('age', 24)
+        weight = cow_profile.get('weight', 400)
+        breed = cow_profile.get('breed', 'Unknown')
+        health = cow_profile.get('health_condition', 'good')
+        name = cow_profile.get('name', 'this cow')
+        
+        # Health multipliers
+        health_multiplier = {
+            'excellent': 1.1, 'good': 1.0, 'fair': 0.9, 
+            'poor': 0.8, 'sick': 0.7, 'pregnant': 1.2, 
+            'lactating': 1.3, 'recovering': 0.85
+        }.get(health, 1.0)
+        
+        # Breed-specific adjustments
+        breed_multiplier = {
+            'Holstein': 1.1, 'Jersey': 0.9, 'Friesian': 1.05,
+            'Ayrshire': 1.0, 'Guernsey': 0.95, 'Brown Swiss': 1.08
+        }.get(breed, 1.0)
+        
+        # Calculate base requirements
+        base_protein = (weight * 0.006 + age * 0.02) * health_multiplier * breed_multiplier
+        base_silage = (weight * 0.04 + age * 0.1) * health_multiplier * breed_multiplier
+        base_minerals = (weight * 0.0008) * health_multiplier
+        
+        quantities = {
+            'protein': f"{base_protein:.1f}",
+            'silage': f"{base_silage:.1f}",
+            'minerals': f"{base_minerals:.2f}"
+        }
+        
+        explanation = self._generate_explanation(cow_profile, quantities)
+        
+        return {
+            'quantities': quantities,
+            'explanation': explanation
+        }
+    
+    def _calculate_protein(self, cow_profile):
+        weight = cow_profile.get('weight', 400)
+        age = cow_profile.get('age', 24)
+        return f"{(weight * 0.006 + age * 0.02):.1f}"
+    
+    def _calculate_silage(self, cow_profile):
+        weight = cow_profile.get('weight', 400)
+        age = cow_profile.get('age', 24)
+        return f"{(weight * 0.04 + age * 0.1):.1f}"
+    
+    def _calculate_minerals(self, cow_profile):
+        weight = cow_profile.get('weight', 400)
+        return f"{(weight * 0.0008):.2f}"
+    
+    def _generate_explanation(self, cow_profile, quantities):
+        name = cow_profile.get('name', 'this cow')
+        breed = cow_profile.get('breed', 'Unknown')
+        age = cow_profile.get('age', 24)
+        weight = cow_profile.get('weight', 400)
+        health = cow_profile.get('health_condition', 'good')
+        
+        return f"This personalized feed plan for {name} is specifically designed considering her {breed} breed characteristics, {age}-month age, {weight}kg body weight, and {health} health condition. {breed} cows have unique nutritional requirements, and at {age} months, {name} needs {quantities['protein']}kg of protein daily for optimal growth and milk production. The {quantities['silage']}kg silage amount provides the necessary fiber for proper digestion, while {quantities['minerals']}kg minerals ensure strong bones and metabolic functions. This combination is perfectly balanced for {name}'s current life stage and breed-specific needs."

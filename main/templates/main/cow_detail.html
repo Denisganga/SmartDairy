@@ -1,267 +1,87 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
-{% block title %}{{ cow.name }} - Smart Dairy{% endblock %}
+{% block title %}{{ cow.name }} - Personalized Feed Plan{% endblock %}
 
 {% block content %}
-<div class="cow-detail-container">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-cow"></i> Smart Dairy</a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
-                <a class="nav-link" href="{% url 'cow_list' %}"><i class="fas fa-list"></i> My Cows</a>
-                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container py-4">
-        <!-- Cow Profile Header -->
-        <div class="row">
-            <div class="col-12">
-                <div class="cow-profile-card fade-in-up">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h1><i class="fas fa-cow me-2"></i>{{ cow.name }}</h1>
-                            <div class="cow-info">
-                                <span class="badge bg-primary me-2">{{ cow.breed }}</span>
-                                <span class="badge bg-secondary me-2">Tag: {{ cow.tag_number }}</span>
-                                <span class="badge bg-info me-2">{{ cow.age }} months old</span>
-                                <span class="badge bg-success" id="healthBadge">{{ cow.health_condition|default:"good"|title }}</span>
-                            </div>
-                            
-                            <!-- Dynamic Health Condition Manager -->
-                            <div class="card mt-3 health-manager">
-                                <div class="card-header bg-gradient-primary text-white">
-                                    <h6 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Health Condition Manager</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Update Health Condition:</label>
-                                            <select class="form-select" id="newHealthCondition">
-                                                <option value="excellent">🌟 Excellent</option>
-                                                <option value="good">✅ Good</option>
-                                                <option value="fair">⚠️ Fair</option>
-                                                <option value="poor">❌ Poor</option>
-                                                <option value="sick">🤒 Sick</option>
-                                                <option value="recovering">🔄 Recovering</option>
-                                                <option value="pregnant">🤱 Pregnant</option>
-                                                <option value="lactating">🥛 Lactating</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Custom Condition:</label>
-                                            <input type="text" class="form-control" id="customCondition" placeholder="Enter custom condition...">
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button class="btn btn-primary me-2" onclick="applyHealthCondition()">
-                                            <i class="fas fa-magic me-1"></i>Apply & Get AI Insights
-                                        </button>
-                                        <button class="btn btn-outline-secondary" onclick="regenerateInsights()">
-                                            <i class="fas fa-sync me-1"></i>Regenerate Insights
-                                        </button>
-                                    </div>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Cow Profile Header -->
+            <div class="card profile-card mb-4">
+                <div class="card-body text-center">
+                    <div class="cow-avatar mb-3">
+                        <i class="fas fa-cow fa-4x text-primary"></i>
+                    </div>
+                    <h2 class="cow-name">{{ cow.name }}</h2>
+                    <div class="cow-characteristics mt-3">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="characteristic-card">
+                                    <i class="fas fa-dna text-info"></i>
+                                    <h6>Breed</h6>
+                                    <p>{{ cow.breed }}</p>
                                 </div>
                             </div>
-                            
-                            <!-- AI Insights Panel -->
-                            <div class="card mt-3 ai-insights-panel" id="aiInsightsPanel" style="display: none;">
-                                <div class="card-header bg-gradient-success text-white">
-                                    <h6 class="mb-0"><i class="fas fa-brain me-2"></i>AI Health Insights</h6>
-                                </div>
-                                <div class="card-body" id="aiInsightsContent">
-                                    <!-- Dynamic AI content will be loaded here -->
+                            <div class="col-md-3">
+                                <div class="characteristic-card">
+                                    <i class="fas fa-calendar text-warning"></i>
+                                    <h6>Age</h6>
+                                    <p>{{ cow.age }} months</p>
                                 </div>
                             </div>
-                            <p class="mt-2 text-muted">Weight: {{ cow.weight }} kg | Added: {{ cow.date_added|date:"M d, Y" }}</p>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <img src="{% static 'images/cow 2.jpg' %}" alt="{{ cow.name }}" class="cow-avatar">
+                            <div class="col-md-3">
+                                <div class="characteristic-card">
+                                    <i class="fas fa-weight text-success"></i>
+                                    <h6>Weight</h6>
+                                    <p>{{ cow.weight }} kg</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="characteristic-card">
+                                    <i class="fas fa-heartbeat text-danger"></i>
+                                    <h6>Health</h6>
+                                    <p>{{ cow.health_condition|default:"Good"|title }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- AI Feed Analysis -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Weekly Feed & Milk Analysis - {{ cow.name }}</h4>
-                                <small>Current Week: {{ current_week_start|date:"M d" }} - {{ current_week_end|date:"M d, Y" }}</small>
-                            </div>
-                            <div class="controls">
-                                {% if week_options %}
-                                <select class="form-select form-select-sm me-2" id="weekSelector" onchange="changeWeek()" style="width: auto; display: inline-block;">
-                                    {% for week in week_options %}
-                                    <option value="{{ week.start_date|date:'Y-m-d' }}" {% if week.is_current %}selected{% endif %}>
-                                        {{ week.label }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                {% endif %}
-                                <select class="form-select form-select-sm me-2" id="daySelector" style="width: auto; display: inline-block;">
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select>
-                                <button class="btn btn-sm btn-light" onclick="addManualEntry()">
-                                    <i class="fas fa-plus"></i> Add Entry
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Weekly Data Table -->
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="weeklyTable">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Day</th>
-                                        <th>Protein (kg)</th>
-                                        <th>Silage (kg)</th>
-                                        <th>Minerals (kg)</th>
-                                        <th>Milk Produced (L)</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="weeklyTableBody">
-                                    {% for record in daily_feed_records %}
-                                    <tr {% if record.status == 'Pending' %}class="table-warning"{% elif record.status == 'Completed' %}class="table-success"{% endif %}>
-                                        <td><strong>{{ record.day_name }}</strong>
-                                            {% if record.status == 'Pending' %}<span class="badge bg-warning ms-2">Pending</span>{% endif %}
-                                        </td>
-                                        <td>{{ record.protein_feed }}</td>
-                                        <td>{{ record.silage }}</td>
-                                        <td>{{ record.minerals }}</td>
-                                        <td>
-                                            {% if record.milk_yield %}
-                                                {{ record.milk_yield }}
-                                            {% else %}
-                                                <input type="number" class="form-control form-control-sm" id="milk_{{ record.id }}"
-                                                       placeholder="Enter yield" style="width: 100px;" step="0.1">
-                                                <button class="btn btn-sm btn-success mt-1" onclick="saveMilk({{ record.id }})">
-                                                    <i class="fas fa-save"></i>
-                                                </button>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if record.status == 'Pending' %}
-                                                <span class="badge bg-warning">Pending</span>
-                                            {% elif record.status == 'Completed' %}
-                                                <span class="badge bg-success">Completed</span>
-                                            {% else %}
-                                                <span class="badge bg-info">{{ record.status }}</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">
-                                            <i class="fas fa-info-circle me-2"></i>
-                                            No feed records yet. Apply AI recommendations or add manual entries to start tracking.
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                                {% if daily_feed_records and averages %}
-                                <tfoot class="table-light">
-                                    <tr id="weeklyAverage">
-                                        <td><strong>Weekly Average</strong></td>
-                                        <td><strong>{{ averages.protein }}</strong></td>
-                                        <td><strong>{{ averages.silage }}</strong></td>
-                                        <td><strong>{{ averages.minerals }}</strong></td>
-                                        <td><strong>{{ averages.milk }}L</strong></td>
-                                        <td><span class="badge bg-primary">Calculated</span></td>
-                                    </tr>
-                                </tfoot>
-                                {% elif daily_feed_records %}
-                                <tfoot class="table-light">
-                                    <tr id="weeklyAverage">
-                                        <td><strong>Weekly Average</strong></td>
-                                        <td><strong>-</strong></td>
-                                        <td><strong>-</strong></td>
-                                        <td><strong>-</strong></td>
-                                        <td><strong>-</strong></td>
-                                        <td><span class="badge bg-secondary">No Data</span></td>
-                                    </tr>
-                                </tfoot>
-                                {% endif %}
-                            </table>
-                        </div>
-
-                        <!-- AI Recommendation for Tomorrow -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="alert alert-primary">
-                                    <h5><i class="fas fa-robot me-2"></i>AI Recommendation for Tomorrow</h5>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <strong>Protein Feed:</strong><br>
-                                            <span class="fs-4 text-success">2.5 kg</span>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Silage:</strong><br>
-                                            <span class="fs-4 text-success">15 kg</span>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Minerals:</strong><br>
-                                            <span class="fs-4 text-success">0.3 kg</span>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <strong>Expected Milk:</strong><br>
-                                            <span class="fs-4 text-primary">{{ prediction.predicted_yield }}L</span>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <small><strong>AI Analysis:</strong> {{ prediction.ai_analysis }}</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <div class="text-center">
-                            <button class="btn btn-success me-2" onclick="applyRecommendation()">
-                                <i class="fas fa-check me-1"></i>Apply Recommendation
-                            </button>
-                            <button class="btn btn-outline-primary" onclick="generateNewPlan()">
-                                <i class="fas fa-sync me-1"></i>Generate New Plan
-                            </button>
-                        </div>
-                    </div>
+            <!-- Feed Generation Section -->
+            <div class="card feed-generation-card">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h4><i class="fas fa-magic me-2"></i>AI-Powered Personalized Feed Plan</h4>
+                    <p class="mb-0">Generate custom nutrition plan based on {{ cow.name }}'s unique characteristics</p>
                 </div>
-            </div>
-        </div>
-            
-            <div class="col-lg-6">
-                <div class="insights-card fade-in-right">
-                    <h4><i class="fas fa-lightbulb me-2 text-warning"></i>Health Insights</h4>
-                    <div class="insights-list">
-                        {% for insight in prediction.health_insights %}
-                        <div class="insight-item">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <span>{{ insight }}</span>
-                        </div>
-                        {% endfor %}
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <button class="btn btn-primary btn-lg generate-btn" onclick="generatePersonalizedFeed()">
+                            <i class="fas fa-robot me-2"></i>Generate Personalized Feed Plan
+                        </button>
                     </div>
-                    
-                    <div class="action-buttons mt-3">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-plus me-1"></i>Add Health Record
-                        </button>
-                        <button class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-utensils me-1"></i>Log Feed Data
-                        </button>
+
+                    <!-- Loading Animation -->
+                    <div id="loadingSection" class="loading-section" style="display: none;">
+                        <div class="text-center py-5">
+                            <div class="loading-animation mb-4">
+                                <div class="spinner-grow text-primary me-2" style="width: 3rem; height: 3rem;"></div>
+                                <div class="spinner-grow text-success me-2" style="width: 3rem; height: 3rem; animation-delay: 0.3s;"></div>
+                                <div class="spinner-grow text-info" style="width: 3rem; height: 3rem; animation-delay: 0.6s;"></div>
+                            </div>
+                            <h4 class="text-primary mb-3">🧠 Gemini AI Analyzing {{ cow.name }}...</h4>
+                            <p class="text-muted">Considering breed characteristics, age, weight, and health condition</p>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                     style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feed Plan Results -->
+                    <div id="feedPlanResults" style="display: none;">
+                        <!-- Results will be populated here -->
                     </div>
                 </div>
             </div>
@@ -270,1341 +90,314 @@
 </div>
 
 <style>
-.cow-detail-container {
-    min-height: 100vh;
-    background: #f8f9fa;
-}
-
-.cow-profile-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+/* Profile Card Styling */
+.profile-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .cow-avatar {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
     width: 120px;
     height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #4CAF50;
-}
-
-.cow-info .badge {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-}
-
-.ai-prediction-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    overflow: hidden;
-}
-
-.prediction-header {
-    padding: 2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.confidence-score {
-    text-align: center;
-}
-
-.score-circle {
-    width: 80px;
-    height: 80px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.1);
 }
 
-.score-number {
-    font-size: 1.5rem;
+.cow-name {
+    font-size: 2.5rem;
     font-weight: 700;
+    margin-bottom: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
-.prediction-content {
-    padding: 2rem;
-    background: white;
-    color: #333;
-}
-
-.prediction-card {
-    background: #f8f9fa;
+.characteristic-card {
+    background: rgba(255,255,255,0.15);
     border-radius: 15px;
-    padding: 1.5rem;
-    height: 100%;
-    border-left: 4px solid #4CAF50;
-    transition: all 0.3s ease;
+    padding: 20px;
+    margin: 10px 0;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
 }
 
-.prediction-card:hover {
+.characteristic-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-.milk-prediction {
-    border-left-color: #2196F3;
-}
-
-.health-prediction {
-    border-left-color: #4CAF50;
-}
-
-.optimization-prediction {
-    border-left-color: #FF9800;
-}
-
-.prediction-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-.milk-prediction .prediction-icon {
-    background: linear-gradient(135deg, #2196F3, #64B5F6);
-}
-
-.health-prediction .prediction-icon {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-}
-
-.optimization-prediction .prediction-icon {
-    background: linear-gradient(135deg, #FF9800, #FFB74D);
-}
-
-.prediction-details h4 {
+.characteristic-card i {
     font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #2d3748;
+    margin-bottom: 10px;
 }
 
-.prediction-title {
+.characteristic-card h6 {
     font-weight: 600;
-    color: #4a5568;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
 }
 
-.prediction-note {
-    color: #718096;
-    font-size: 0.85rem;
+.characteristic-card p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0;
 }
 
-.ai-explanation {
-    background: #f7fafc;
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-top: 2rem;
-}
-
-.ai-explanation h5 {
-    color: #2d3748;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-}
-
-.explanation-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.step {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-}
-
-.step-number {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.step-content {
-    flex: 1;
-    padding-top: 0.25rem;
-}
-
-.step-content strong {
-    color: #2d3748;
-}
-
-.recommendations-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
-.card-header {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.card-header h4 {
-    margin: 0;
-    color: #2d3748;
-}
-
-.recommendations-list {
-    padding: 1.5rem;
-}
-
-.recommendation-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    border-left: 4px solid #4CAF50;
-}
-
-.feed-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    flex-shrink: 0;
-}
-
-.feed-details {
-    flex: 1;
-}
-
-.feed-header {
-    display: flex;
-    justify-content: between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.feed-header strong {
-    color: #2d3748;
-    font-size: 1rem;
-}
-
-.feed-quantity {
-    background: #4CAF50;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.feed-reason {
-    color: #718096;
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-}
-
-.feed-timing {
-    color: #4a5568;
-    font-size: 0.8rem;
-}
-
-.total-nutrition {
-    background: #e6fffa;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e9ecef;
-}
-
-.total-nutrition h6 {
-    color: #2d3748;
-    margin-bottom: 0.75rem;
-}
-
-.nutrition-summary {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.nutrition-item {
-    background: white;
-    padding: 0.5rem 1rem;
+/* Feed Generation Card */
+.feed-generation-card {
+    border: none;
     border-radius: 20px;
-    font-size: 0.85rem;
-    color: #4a5568;
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-.prediction-header {
-    display: flex;
-    justify-content: between;
-    align-items: center;
-    margin-bottom: 1rem;
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
 }
 
-.confidence-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-}
-
-.prediction-metric {
-    display: flex;
-    align-items: center;
-    background: rgba(255,255,255,0.1);
-    padding: 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-}
-
-.metric-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
+.generate-btn {
+    padding: 15px 40px;
     font-size: 1.2rem;
-}
-
-.metric-content h4 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.metric-content p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.9rem;
-}
-
-.recommendations-card, .insights-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    height: 100%;
-}
-
-.recommendation-item {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border-left: 4px solid #4CAF50;
-}
-
-.rec-header {
-    display: flex;
-    justify-content: between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.quantity {
-    background: #4CAF50;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
     font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-.rec-reason {
-    color: #666;
-    font-size: 0.9rem;
-    margin: 0;
+.generate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
-.insight-item {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.ai-story-card {
-    background: white;
-    padding: 2rem;
+/* Loading Animation */
+.loading-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin: 20px 0;
 }
 
-.story-step {
-    display: flex;
-    margin-bottom: 2rem;
-    align-items: flex-start;
-}
-
-.step-number {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    margin-right: 1rem;
-    flex-shrink: 0;
-}
-
-.step-content h6 {
-    color: #333;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.step-content p {
-    color: #666;
-    margin: 0;
-    line-height: 1.6;
-}
-</style>
-
-<script>
-function refreshAIAnalysis() {
-    // Show loading state
-    const loadingSpinner = document.getElementById('aiLoadingSpinner');
-    const confidenceBadge = document.getElementById('confidenceBadge');
-    const aiContent = document.getElementById('aiContent');
-    
-    loadingSpinner.classList.remove('d-none');
-    confidenceBadge.classList.add('d-none');
-    aiContent.style.opacity = '0.5';
-    
-    // Simulate AI analysis with random data
-    setTimeout(() => {
-        const newYield = (Math.random() * 10 + 20).toFixed(1);
-        const newHealth = Math.floor(Math.random() * 20 + 80);
-        const newOptimization = (Math.random() * 10 + 5).toFixed(1);
-        const newConfidence = Math.floor(Math.random() * 15 + 85);
-        
-        document.getElementById('predictedYield').textContent = newYield + 'L';
-        document.getElementById('healthScore').textContent = newHealth + '%';
-        document.getElementById('optimizationPotential').textContent = '+' + newOptimization + '%';
-        confidenceBadge.textContent = newConfidence + '% Confidence';
-        
-        // Hide loading state
-        loadingSpinner.classList.add('d-none');
-        confidenceBadge.classList.remove('d-none');
-        aiContent.style.opacity = '1';
-    }, 2000); // 2 second loading simulation
-}
-
-function refreshFeedRecommendations() {
-    const feedSpinner = document.getElementById('feedLoadingSpinner');
-    const feedRecommendations = document.getElementById('feedRecommendations');
-    
-    feedSpinner.classList.remove('d-none');
-    feedRecommendations.style.opacity = '0.5';
-    
-    setTimeout(() => {
-        // Simulate new recommendations
-        const recommendations = [
-            { type: 'High-protein concentrate', quantity: (Math.random() * 2 + 2).toFixed(1), reason: 'Boost milk protein content' },
-            { type: 'Fresh grass silage', quantity: (Math.random() * 5 + 12).toFixed(1), reason: 'Optimal fiber for digestion' },
-            { type: 'Mineral supplement', quantity: (Math.random() * 0.2 + 0.2).toFixed(1), reason: 'Maintain calcium levels' }
-        ];
-        
-        feedRecommendations.innerHTML = recommendations.map(rec => `
-            <div class="recommendation-item">
-                <div class="rec-header">
-                    <strong>${rec.type}</strong>
-                    <span class="quantity">${rec.quantity} kg/day</span>
-                </div>
-                <p class="rec-reason">${rec.reason}</p>
-            </div>
-        `).join('');
-        
-        feedSpinner.classList.add('d-none');
-        feedRecommendations.style.opacity = '1';
-    }, 1500);
-}
-
-function applyRecommendation() {
-    // Call API to save recommendation to database
-    fetch(`/api/apply-recommendation/{{ cow.id }}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (data.new_week) {
-                // Show message about new week and reload
-                showMessage(`New week started! AI recommendation applied for ${data.day}`, 'success');
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                // Add new row to current table
-                const tableBody = document.getElementById('weeklyTableBody');
-                const newRow = document.createElement('tr');
-                newRow.className = 'table-warning';
-                
-                newRow.innerHTML = `
-                    <td><strong>${data.day}</strong> <span class="badge bg-warning">Pending</span></td>
-                    <td>${data.protein}</td>
-                    <td>${data.silage}</td>
-                    <td>${data.minerals}</td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" id="milk_${data.record_id}"
-                               placeholder="Enter yield" style="width: 100px;" step="0.1">
-                        <button class="btn btn-sm btn-success mt-1" onclick="saveMilk(${data.record_id})">
-                            <i class="fas fa-save"></i>
-                        </button>
-                    </td>
-                    <td><span class="badge bg-warning">Applied</span></td>
-                `;
-                
-                tableBody.appendChild(newRow);
-                
-                // Update button
-                event.target.innerHTML = '<i class="fas fa-check me-1"></i>Applied';
-                event.target.disabled = true;
-                event.target.className = 'btn btn-secondary me-2';
-                
-                showMessage(`AI recommendation applied for ${data.day}!`, 'success');
-            }
-        } else {
-            showMessage('Failed to apply recommendation', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Error applying recommendation', 'error');
-    });
-}
-
-function changeWeek() {
-    const selector = document.getElementById('weekSelector');
-    const selectedWeek = selector.value;
-    
-    // Reload page with selected week
-    window.location.href = `?week=${selectedWeek}`;
-}
-
-function updateMilkYield(recordId) {
-    const milkInput = document.getElementById('milkInput');
-    const milkValue = milkInput.value;
-    
-    if (!milkValue || milkValue <= 0) {
-        showMessage('Please enter a valid milk yield', 'error');
-        return;
-    }
-    
-    // Call API to update milk yield in database
-    fetch(`/api/update-milk-yield/${recordId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'milk_yield': milkValue
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const pendingRow = document.getElementById('pending-row');
-            const dayName = pendingRow.querySelector('td').textContent.split(' ')[0];
-            
-            // Update the row
-            pendingRow.className = 'table-success';
-            pendingRow.innerHTML = `
-                <td><strong>${dayName}</strong></td>
-                <td>2.5</td>
-                <td>15</td>
-                <td>0.3</td>
-                <td>${milkValue}</td>
-                <td><span class="badge bg-success">Completed</span></td>
-            `;
-            
-            // Update weekly averages immediately if provided by server
-            if (data.averages) {
-                const avgRow = document.getElementById('weeklyAverage');
-                avgRow.cells[1].innerHTML = `<strong>${data.averages.protein}</strong>`;
-                avgRow.cells[2].innerHTML = `<strong>${data.averages.silage}</strong>`;
-                avgRow.cells[3].innerHTML = `<strong>${data.averages.minerals}</strong>`;
-                avgRow.cells[4].innerHTML = `<strong>${data.averages.milk}L</strong>`;
-            } else {
-                // Calculate from current table if server doesn't provide averages
-                calculateTableAverages();
-            }
-            
-            // Re-enable apply button for next day
-            const applyBtn = document.querySelector('.btn-secondary');
-            if (applyBtn) {
-                applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Recommendation';
-                applyBtn.disabled = false;
-                applyBtn.className = 'btn btn-success me-2';
-            }
-            
-            showMessage(`Milk yield updated: ${milkValue}L recorded for ${dayName}!`, 'success');
-        } else {
-            showMessage('Failed to update milk yield', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Error updating milk yield', 'error');
-    });
-}
-
-function addManualEntry() {
-    const selectedDay = document.getElementById('daySelector').value;
-    
-    // Check if day already exists
-    const existingRows = document.querySelectorAll('#weeklyTableBody tr');
-    for (let row of existingRows) {
-        if (row.cells[0] && row.cells[0].textContent.includes(selectedDay)) {
-            showMessage(`${selectedDay} already exists in the table`, 'error');
-            return;
-        }
-    }
-    
-    // Create manual entry via API
-    fetch(`/api/add-manual-entry/{{ cow.id }}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'day': selectedDay,
-            'protein': 2.0,
-            'silage': 12.0,
-            'minerals': 0.2
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload(); // Reload to show new entry
-        } else {
-            showMessage('Failed to add manual entry', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Error adding manual entry', 'error');
-    });
-}
-
-function saveMilkYield(recordId) {
-    const inputElement = document.getElementById(`milkInput${recordId}`);
-    const milkValue = inputElement.value;
-    
-    if (!milkValue || milkValue <= 0) {
-        showMessage('Please enter a number greater than 0', 'error');
-        return;
-    }
-    
-    // Call API to update milk yield in database
-    fetch(`/api/update-milk-yield/${recordId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'milk_yield': milkValue
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showMessage('Milk yield saved successfully!', 'success');
-            // Reload page to show updated data
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showMessage('Failed to update milk yield', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('Error updating milk yield', 'error');
-    });
-}
-
-function updateMilkYield(recordId, milkValue) {
-    // This function is kept for compatibility
-    saveMilkYield(recordId);
-}
-
-function updateWeeklyAverage() {
-    const tableBody = document.getElementById('weeklyTableBody');
-    const rows = tableBody.querySelectorAll('tr');
-    
-    let totalProtein = 0, totalSilage = 0, totalMinerals = 0, totalMilk = 0;
-    let count = 0;
-    
-    rows.forEach(row => {
-        const cells = row.cells;
-        if (cells.length >= 5) {
-            const protein = parseFloat(cells[1].textContent);
-            const silage = parseFloat(cells[2].textContent);
-            const minerals = parseFloat(cells[3].textContent);
-            const milk = parseFloat(cells[4].textContent);
-            
-            if (!isNaN(protein) && !isNaN(silage) && !isNaN(minerals) && !isNaN(milk)) {
-                totalProtein += protein;
-                totalSilage += silage;
-                totalMinerals += minerals;
-                totalMilk += milk;
-                count++;
-            }
-        }
-    });
-    
-    if (count > 0) {
-        const avgRow = document.getElementById('weeklyAverage');
-        avgRow.cells[1].innerHTML = `<strong>${(totalProtein / count).toFixed(2)}</strong>`;
-        avgRow.cells[2].innerHTML = `<strong>${(totalSilage / count).toFixed(1)}</strong>`;
-        avgRow.cells[3].innerHTML = `<strong>${(totalMinerals / count).toFixed(2)}</strong>`;
-        avgRow.cells[4].innerHTML = `<strong>${(totalMilk / count).toFixed(1)}L</strong>`;
-    }
-}
-
-function addWeekToHistory() {
-    // Store current week data (in a real app, this would go to database)
-    const currentWeek = getCurrentWeekData();
-    
-    // Add to localStorage for demo purposes
-    let weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
-    weekHistory.unshift(currentWeek);
-    
-    // Keep only last 10 weeks
-    if (weekHistory.length > 10) {
-        weekHistory = weekHistory.slice(0, 10);
-    }
-    
-    localStorage.setItem('weekHistory', JSON.stringify(weekHistory));
-}
-
-function getCurrentWeekData() {
-    const tableBody = document.getElementById('weeklyTableBody');
-    const rows = tableBody.querySelectorAll('tr');
-    const weekData = [];
-    
-    rows.forEach(row => {
-        const cells = row.cells;
-        if (cells.length >= 5) {
-            weekData.push({
-                day: cells[0].textContent.trim(),
-                protein: cells[1].textContent,
-                silage: cells[2].textContent,
-                minerals: cells[3].textContent,
-                milk: cells[4].textContent,
-                status: cells[5].textContent
-            });
-        }
-    });
-    
-    return {
-        date: new Date().toISOString().split('T')[0],
-        data: weekData
-    };
-}
-
-function updateWeekSelector() {
-    const selector = document.getElementById('weekSelector');
-    const weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
-    
-    // Clear existing options except current week
-    selector.innerHTML = '<option value="current">Current Week</option>';
-    
-    // Add historical weeks
-    weekHistory.forEach((week, index) => {
-        const option = document.createElement('option');
-        option.value = `week${index}`;
-        option.textContent = `Week ${index + 1} (${new Date(week.date).toLocaleDateString()})`;
-        selector.appendChild(option);
-    });
-}
-
-function changeWeek() {
-    const selector = document.getElementById('weekSelector');
-    const selectedWeek = selector.value;
-    
-    if (selectedWeek === 'current') {
-        // Show current week (reload page or reset to current data)
-        location.reload();
-    } else {
-        // Load historical week
-        const weekIndex = parseInt(selectedWeek.replace('week', ''));
-        const weekHistory = JSON.parse(localStorage.getItem('weekHistory') || '[]');
-        
-        if (weekHistory[weekIndex]) {
-            loadHistoricalWeek(weekHistory[weekIndex]);
-        }
-    }
-}
-
-function loadHistoricalWeek(weekData) {
-    const tableBody = document.getElementById('weeklyTableBody');
-    tableBody.innerHTML = '';
-    
-    weekData.data.forEach(dayData => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><strong>${dayData.day}</strong></td>
-            <td>${dayData.protein}</td>
-            <td>${dayData.silage}</td>
-            <td>${dayData.minerals}</td>
-            <td>${dayData.milk}</td>
-            <td>${dayData.status}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-    
-    // Disable apply button for historical weeks
-    const applyBtn = document.querySelector('.btn-success, .btn-secondary');
-    if (applyBtn) {
-        applyBtn.style.display = 'none';
-    }
-    
-    showMessage('Historical week loaded', 'info');
-}
-
-function generateNewPlan() {
-    // Simulate generating new recommendations
-    const recommendations = [
-        { protein: 2.3, silage: 14, minerals: 0.25, expectedMilk: 24.8 },
-        { protein: 2.7, silage: 16, minerals: 0.35, expectedMilk: 26.2 },
-        { protein: 2.4, silage: 13, minerals: 0.3, expectedMilk: 25.1 }
-    ];
-    
-    const randomPlan = recommendations[Math.floor(Math.random() * recommendations.length)];
-    
-    // Update recommendation display
-    const recDiv = document.querySelector('.alert-primary .row');
-    recDiv.innerHTML = `
-        <div class="col-md-3">
-            <strong>Protein Feed:</strong><br>
-            <span class="fs-4 text-success">${randomPlan.protein} kg</span>
-        </div>
-        <div class="col-md-3">
-            <strong>Silage:</strong><br>
-            <span class="fs-4 text-success">${randomPlan.silage} kg</span>
-        </div>
-        <div class="col-md-3">
-            <strong>Minerals:</strong><br>
-            <span class="fs-4 text-success">${randomPlan.minerals} kg</span>
-        </div>
-        <div class="col-md-3">
-            <strong>Expected Milk:</strong><br>
-            <span class="fs-4 text-primary">${randomPlan.expectedMilk}L</span>
-        </div>
-    `;
-    
-    // Re-enable apply button
-    const applyBtn = document.querySelector('.btn-success, .btn-secondary');
-    applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Recommendation';
-    applyBtn.disabled = false;
-    applyBtn.className = 'btn btn-success me-2';
-    
-    showMessage('New AI plan generated!', 'info');
-}
-
-function showMessage(message, type) {
-    const alertClass = type === 'success' ? 'alert-success' : 
-                     type === 'error' ? 'alert-danger' : 'alert-info';
-    
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 3000);
-}
-
-function saveMilk(recordId) {
-    const input = document.getElementById('milk_' + recordId);
-    const value = input.value;
-    
-    if (!value || value <= 0) {
-        alert('Please enter a valid number');
-        return;
-    }
-    
-    fetch(`/api/update-milk-yield/${recordId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({'milk_yield': value})
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error saving');
-        }
-    });
-}
-</script>
-{% endblock %}
-let currentHealthCondition = '{{ cow.health_condition|default:"good" }}';
-
-function applyHealthCondition() {
-    const selectedCondition = document.getElementById('newHealthCondition').value;
-    const customCondition = document.getElementById('customCondition').value.trim();
-    const finalCondition = customCondition || selectedCondition;
-    
-    console.log('Applying health condition:', finalCondition);
-    
-    // Update UI with animation
-    updateHealthBadge(finalCondition);
-    
-    // Get AI insights for the new condition
-    getAIHealthInsights(finalCondition);
-    
-    // Update backend
-    updateHealthConditionBackend(finalCondition);
-}
-
-function getAIHealthInsights(condition) {
-    const panel = document.getElementById('aiInsightsPanel');
-    const content = document.getElementById('aiInsightsContent');
-    
-    console.log('Getting AI insights for:', condition);
-    
-    // Show panel with enhanced loading animation
-    panel.style.display = 'block';
-    content.innerHTML = `
-        <div class="text-center py-4">
-            <div class="loading-container mb-3">
-                <div class="spinner-grow text-primary me-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <div class="spinner-grow text-success me-2" role="status" style="animation-delay: 0.2s;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <div class="spinner-grow text-info" role="status" style="animation-delay: 0.4s;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-            <h5 class="text-primary">🧠 Gemini AI is Analyzing...</h5>
-            <p class="text-muted">Generating personalized insights for <strong>${condition}</strong> condition</p>
-            <div class="progress mt-3" style="height: 6px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
-                     role="progressbar" style="width: 100%"></div>
-            </div>
-        </div>
-    `;
-    
-    // Call AI service
-    fetch('/api/get-health-insights/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({
-            cow_id: {{ cow.id }},
-            health_condition: condition,
-            cow_details: {
-                name: '{{ cow.name }}',
-                breed: '{{ cow.breed }}',
-                age: {{ cow.age }},
-                weight: {{ cow.weight|default:400 }}
-            }
-        })
-    })
-    .then(response => {
-        console.log('API Response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('API Response data:', data);
-        // Add delay for smooth transition
-        setTimeout(() => {
-            if (data.success) {
-                displayFormattedInsights(data.insights, condition);
-            } else {
-                console.error('API Error:', data.error);
-                displayFallbackInsights(condition);
-            }
-        }, 2000); // 2 second delay to show loading animation
-    })
-    .catch(error => {
-        console.error('Fetch Error:', error);
-        setTimeout(() => {
-            displayFallbackInsights(condition);
-        }, 2000);
-    });
-}
-
-function updateHealthBadge(condition) {
-    const badge = document.getElementById('healthBadge');
-    const conditionEmojis = {
-        'excellent': '🌟',
-        'good': '✅',
-        'fair': '⚠️',
-        'poor': '❌',
-        'sick': '🤒',
-        'recovering': '🔄',
-        'pregnant': '🤱',
-        'lactating': '🥛'
-    };
-    
-    const conditionColors = {
-        'excellent': 'bg-success',
-        'good': 'bg-primary',
-        'fair': 'bg-warning',
-        'poor': 'bg-danger',
-        'sick': 'bg-danger',
-        'recovering': 'bg-info',
-        'pregnant': 'bg-purple',
-        'lactating': 'bg-success'
-    };
-    
-    // Animate badge change
-    badge.style.transform = 'scale(0.8)';
-    badge.style.opacity = '0.5';
-    
-    setTimeout(() => {
-        badge.className = `badge ${conditionColors[condition] || 'bg-secondary'}`;
-        badge.innerHTML = `${conditionEmojis[condition] || '📊'} ${condition.charAt(0).toUpperCase() + condition.slice(1)}`;
-        badge.style.transform = 'scale(1)';
-        badge.style.opacity = '1';
-    }, 200);
-    
-    currentHealthCondition = condition;
-}
-
-function getAIHealthInsights(condition) {
-    const panel = document.getElementById('aiInsightsPanel');
-    const content = document.getElementById('aiInsightsContent');
-    
-    // Show panel with loading animation
-    panel.style.display = 'block';
-    content.innerHTML = `
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Generating insights...</span>
-            </div>
-            <p class="mt-2">🧠 AI is analyzing ${condition} condition...</p>
-        </div>
-    `;
-    
-    // Call AI service
-    fetch('/api/get-health-insights/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({
-            cow_id: {{ cow.id }},
-            health_condition: condition,
-            cow_details: {
-                name: '{{ cow.name }}',
-                breed: '{{ cow.breed }}',
-                age: {{ cow.age }},
-                weight: {{ cow.weight }}
-            }
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            displayFormattedInsights(data.insights, condition);
-        } else {
-            displayFallbackInsights(condition);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        displayFallbackInsights(condition);
-    });
-}
-
-function displayFormattedInsights(insights, condition) {
-    const content = document.getElementById('aiInsightsContent');
-    const conditionIcons = {
-        'excellent': '🌟',
-        'good': '✅',
-        'fair': '⚠️',
-        'poor': '❌',
-        'sick': '🤒',
-        'recovering': '🔄',
-        'pregnant': '🤱',
-        'lactating': '🥛'
-    };
-    
-    content.innerHTML = `
-        <div class="insights-container">
-            <div class="insight-header">
-                <h5>${conditionIcons[condition] || '📊'} ${condition.charAt(0).toUpperCase() + condition.slice(1)} Condition Analysis</h5>
-            </div>
-            
-            <div class="row mt-3">
-                <div class="col-md-4">
-                    <div class="insight-card bg-light p-3 rounded">
-                        <h6><i class="fas fa-utensils text-primary"></i> Nutrition Plan</h6>
-                        <div class="nutrition-details">
-                            ${insights.nutrition || 'Optimized feeding schedule recommended'}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="insight-card bg-light p-3 rounded">
-                        <h6><i class="fas fa-stethoscope text-success"></i> Health Actions</h6>
-                        <div class="health-actions">
-                            ${insights.health_actions || 'Monitor vital signs regularly'}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="insight-card bg-light p-3 rounded">
-                        <h6><i class="fas fa-chart-line text-info"></i> Expected Outcomes</h6>
-                        <div class="outcomes">
-                            ${insights.outcomes || 'Positive health trajectory expected'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="alert alert-info mt-3">
-                <h6><i class="fas fa-lightbulb"></i> AI Recommendation</h6>
-                <p class="mb-0">${insights.recommendation || 'Continue monitoring and maintain current care routine.'}</p>
-            </div>
-            
-            <div class="text-muted small mt-2">
-                <i class="fas fa-robot"></i> Generated by Gemini AI • ${new Date().toLocaleString()}
-            </div>
-        </div>
-    `;
-}
-
-function displayFallbackInsights(condition) {
-    const content = document.getElementById('aiInsightsContent');
-    const fallbackInsights = {
-        'excellent': {
-            nutrition: 'Maintain current high-quality feed. Increase protein by 10%.',
-            health_actions: 'Continue regular health checks. Monitor for any changes.',
-            outcomes: 'Expect optimal milk production and reproductive health.',
-            recommendation: 'Your cow is in excellent condition! Keep up the great care routine.'
-        },
-        'sick': {
-            nutrition: 'Reduce feed by 20%. Focus on easily digestible foods.',
-            health_actions: 'Contact veterinarian immediately. Isolate if necessary.',
-            outcomes: 'Recovery expected with proper treatment within 5-7 days.',
-            recommendation: 'Immediate veterinary attention required. Monitor closely.'
-        },
-        'pregnant': {
-            nutrition: 'Increase calcium and protein. Add prenatal supplements.',
-            health_actions: 'Schedule regular pregnancy checks. Prepare calving area.',
-            outcomes: 'Healthy calf expected. Monitor for calving signs.',
-            recommendation: 'Special care needed during pregnancy. Adjust feeding schedule.'
-        }
-    };
-    
-    const insights = fallbackInsights[condition] || fallbackInsights['excellent'];
-    displayFormattedInsights(insights, condition);
-}
-
-function regenerateInsights() {
-    if (currentHealthCondition) {
-        getAIHealthInsights(currentHealthCondition);
-    }
-}
-
-function updateHealthConditionBackend(condition) {
-    fetch('/api/update-health-condition/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({
-            cow_id: {{ cow.id }},
-            health_condition: condition
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Health condition updated successfully');
-        }
-    })
-    .catch(error => console.error('Error updating health condition:', error));
-}
-/* Enhanced Loading Animations */
-.loading-container {
+.loading-animation {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.spinner-grow {
-    animation-duration: 1.5s;
 }
 
 .progress {
     border-radius: 10px;
-    overflow: hidden;
+    height: 8px;
+    background: rgba(0,0,0,0.1);
 }
 
-.progress-bar-animated {
-    animation: progress-bar-stripes 1s linear infinite;
-}
-
-@keyframes progress-bar-stripes {
-    0% { background-position: 1rem 0; }
-    100% { background-position: 0 0; }
-}
-
-/* Pulse animation for loading text */
-.text-primary {
-    animation: pulse-text 2s ease-in-out infinite;
-}
-
-@keyframes pulse-text {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-/* Health Manager Styling */
-.health-manager {
+/* Results Section */
+.feed-plan-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     border-radius: 15px;
-    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
 }
 
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.bg-gradient-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-}
-
-.ai-insights-panel {
-    border: none;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-radius: 15px;
-    overflow: hidden;
-    animation: slideInUp 0.5s ease-out;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.insights-container {
-    animation: fadeIn 0.6s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.insight-card {
-    border-left: 4px solid #667eea;
-    transition: all 0.3s ease;
-    margin-bottom: 15px;
-}
-
-.insight-card:hover {
+.feed-plan-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.insight-header h5 {
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.nutrition-details, .health-actions, .outcomes {
-    font-size: 0.9em;
-    line-height: 1.5;
-    color: #555;
-}
-
-#healthBadge {
-    transition: all 0.3s ease;
-    font-size: 0.9em;
-    padding: 8px 12px;
-}
-
-.bg-purple {
-    background-color: #9b59b6 !important;
-}
-
-.form-select, .form-control {
+.feed-item {
+    background: white;
     border-radius: 10px;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
+    padding: 20px;
+    margin: 10px 0;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.form-select:focus, .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+.feed-quantity {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
 }
 
-.btn {
-    border-radius: 10px;
-    font-weight: 500;
-    transition: all 0.3s ease;
+.ai-explanation {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 20px;
+    border-left: 5px solid #2196f3;
+}
+</style>
+
+<script>
+function generatePersonalizedFeed() {
+    // Hide generate button and show loading
+    document.querySelector('.generate-btn').style.display = 'none';
+    document.getElementById('loadingSection').style.display = 'block';
+    document.getElementById('feedPlanResults').style.display = 'none';
+    
+    // Call AI service
+    fetch('/api/generate-personalized-feed/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            cow_id: {{ cow.id }},
+            cow_profile: {
+                name: '{{ cow.name }}',
+                breed: '{{ cow.breed }}',
+                age: {{ cow.age }},
+                weight: {{ cow.weight|default:400 }},
+                health_condition: '{{ cow.health_condition|default:"good" }}'
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        setTimeout(() => {
+            displayFeedPlan(data);
+        }, 3000); // 3 second loading animation
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        setTimeout(() => {
+            displayFallbackPlan();
+        }, 3000);
+    });
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+function displayFeedPlan(data) {
+    document.getElementById('loadingSection').style.display = 'none';
+    const resultsDiv = document.getElementById('feedPlanResults');
+    
+    if (data.success) {
+        resultsDiv.innerHTML = `
+            <div class="feed-plan-card">
+                <div class="card-body">
+                    <h5 class="text-center mb-4">
+                        <i class="fas fa-star text-warning"></i>
+                        Personalized Feed Plan for {{ cow.name }}
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="feed-item text-center">
+                                <i class="fas fa-seedling fa-2x text-success mb-2"></i>
+                                <h6>Protein Feed</h6>
+                                <div class="feed-quantity">${data.feed_plan.protein} kg</div>
+                                <small class="text-muted">Daily requirement</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feed-item text-center">
+                                <i class="fas fa-leaf fa-2x text-info mb-2"></i>
+                                <h6>Silage/Roughage</h6>
+                                <div class="feed-quantity">${data.feed_plan.silage} kg</div>
+                                <small class="text-muted">Daily requirement</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feed-item text-center">
+                                <i class="fas fa-gem fa-2x text-warning mb-2"></i>
+                                <h6>Minerals</h6>
+                                <div class="feed-quantity">${data.feed_plan.minerals} kg</div>
+                                <small class="text-muted">Daily requirement</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-explanation">
+                        <h6><i class="fas fa-brain text-primary me-2"></i>AI Analysis for {{ cow.name }}</h6>
+                        <p>${data.ai_explanation}</p>
+                        <div class="text-muted small mt-2">
+                            <i class="fas fa-robot me-1"></i>Generated by Gemini AI based on {{ cow.name }}'s profile
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <button class="btn btn-outline-primary" onclick="generatePersonalizedFeed()">
+                    <i class="fas fa-sync me-2"></i>Generate New Plan
+                </button>
+            </div>
+        `;
+    } else {
+        displayFallbackPlan();
+    }
+    
+    resultsDiv.style.display = 'block';
 }
+
+function displayFallbackPlan() {
+    // Fallback plan based on cow characteristics
+    const age = {{ cow.age }};
+    const weight = {{ cow.weight|default:400 }};
+    const breed = '{{ cow.breed }}';
+    
+    // Calculate based on characteristics
+    const protein = (weight * 0.006 + age * 0.02).toFixed(1);
+    const silage = (weight * 0.04 + age * 0.1).toFixed(1);
+    const minerals = (weight * 0.0008).toFixed(2);
+    
+    document.getElementById('loadingSection').style.display = 'none';
+    document.getElementById('feedPlanResults').innerHTML = `
+        <div class="feed-plan-card">
+            <div class="card-body">
+                <h5 class="text-center mb-4">
+                    <i class="fas fa-star text-warning"></i>
+                    Personalized Feed Plan for {{ cow.name }}
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="feed-item text-center">
+                            <i class="fas fa-seedling fa-2x text-success mb-2"></i>
+                            <h6>Protein Feed</h6>
+                            <div class="feed-quantity">${protein} kg</div>
+                            <small class="text-muted">Daily requirement</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feed-item text-center">
+                            <i class="fas fa-leaf fa-2x text-info mb-2"></i>
+                            <h6>Silage/Roughage</h6>
+                            <div class="feed-quantity">${silage} kg</div>
+                            <small class="text-muted">Daily requirement</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feed-item text-center">
+                            <i class="fas fa-gem fa-2x text-warning mb-2"></i>
+                            <h6>Minerals</h6>
+                            <div class="feed-quantity">${minerals} kg</div>
+                            <small class="text-muted">Daily requirement</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-explanation">
+                    <h6><i class="fas fa-brain text-primary me-2"></i>Analysis for {{ cow.name }}</h6>
+                    <p>Based on {{ cow.name }}'s profile (${breed} breed, ${age} months old, ${weight}kg), this feed plan is optimized for optimal health and milk production. The ${breed} breed requires specific nutrition ratios, and at ${age} months, {{ cow.name }} needs balanced protein for growth and maintenance.</p>
+                    <div class="text-muted small mt-2">
+                        <i class="fas fa-calculator me-1"></i>Calculated based on {{ cow.name }}'s characteristics
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <button class="btn btn-outline-primary" onclick="generatePersonalizedFeed()">
+                <i class="fas fa-sync me-2"></i>Generate New Plan
+            </button>
+        </div>
+    `;
+    document.getElementById('feedPlanResults').style.display = 'block';
+}
+</script>
+
+{% csrf_token %}
+{% endblock %}

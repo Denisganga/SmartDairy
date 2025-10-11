@@ -567,3 +567,38 @@ def update_health_condition_api(request):
             })
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+@login_required
+def generate_personalized_feed_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cow_id = data.get('cow_id')
+            cow_profile = data.get('cow_profile', {})
+            
+            print(f"Generating personalized feed for cow {cow_id}")
+            print(f"Cow profile: {cow_profile}")
+            
+            cow = get_object_or_404(Cow, id=cow_id, owner=request.user)
+            
+            # Get personalized feed plan using Gemini AI
+            ai_service = AIService()
+            feed_plan = ai_service.generate_personalized_feed_plan(cow_profile)
+            
+            print(f"Generated feed plan: {feed_plan}")
+            
+            return JsonResponse({
+                'success': True,
+                'feed_plan': feed_plan['quantities'],
+                'ai_explanation': feed_plan['explanation']
+            })
+            
+        except Exception as e:
+            print(f"Error in personalized feed API: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
