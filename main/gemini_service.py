@@ -102,29 +102,27 @@ class AIService:
     def _build_feed_prompt(self, cow_data, language):
         if language == 'sw':
             return f"""
-            Mshauri wa lishe. Toa mapendekezo mafupi kwa ng'ombe:
+            Toa mapendekezo mafupi ya lishe kwa {cow_data['name']}:
             
-            {cow_data['name']} - {cow_data['breed']} - {cow_data['age']} miezi
+            Muundo:
+            PROTINI: [kg] - [%]
+            MAJANI: [kg]
+            MADINI: [kg]  
+            MAZIWA: [L/siku]
             
-            Toa kwa muundo huu:
-            PROTINI: [kiasi]kg - [sababu fupi]
-            MAJANI: [kiasi]kg - [sababu fupi]
-            MADINI: [kiasi]kg - [sababu fupi]
-            MAZIWA: [kiasi]L/siku
-            SWALI: [swali la kufuatilia]
+            Jibu kwa sentensi 1-2 tu kwa kila kitu.
             """
         else:
             return f"""
-            Feed advisor. Brief recommendations for cow:
-            
-            {cow_data['name']} - {cow_data['breed']} - {cow_data['age']} months
+            Brief feed recommendations for {cow_data['name']}:
             
             Format:
-            PROTEIN: [amount]kg - [brief reason with % content]
-            SILAGE: [amount]kg - [brief reason]
-            MINERALS: [amount]kg - [brief reason]
-            MILK: [amount]L/day expected
-            QUESTION: [follow-up question]
+            PROTEIN: [kg] - [% content]
+            SILAGE: [kg]
+            MINERALS: [kg]
+            MILK: [L/day]
+            
+            Keep each explanation to 1-2 sentences max.
             """
     
     def _build_prediction_prompt(self, cow_data, language):

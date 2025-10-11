@@ -164,7 +164,7 @@ def cow_detail(request, cow_id):
     }
     
     # Get real AI predictions and analysis
-    feed_recommendations = ai_service.get_feed_recommendation(cow_data)
+    feed_recommendations = ai_service.get_feed_recommendation(cow_data, language='sw')
     production_prediction = ai_service.predict_milk_production(cow_data)
     
     # Generate specific AI feed analysis using Gemini
@@ -322,7 +322,7 @@ def apply_recommendation_api(request, cow_id):
             'age': cow.age,
             'weight': cow.weight
         }
-        feed_recommendations = ai_service.get_feed_recommendation(cow_data)
+        feed_recommendations = ai_service.get_feed_recommendation(cow_data, language='sw')
         recommendations = feed_recommendations.get('recommendations', [])
         
         # Extract feed amounts from AI recommendations
