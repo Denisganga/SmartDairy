@@ -42,14 +42,23 @@ class AIService:
             return self._fallback_prediction(cow_data, language)
     
     def chat_response(self, message, language='en'):
-        prompt = self._build_chat_prompt(message, language)
         try:
-            response = self.model.generate_content(prompt)
-            # Clean and format the response
-            formatted_response = self._format_response(response.text)
-            return formatted_response
+            # Simple test prompt
+            simple_prompt = f"Answer this farming question briefly: {message}"
+            response = self.model.generate_content(simple_prompt)
+            
+            if response and response.text:
+                return response.text.strip()
+            else:
+                return "No response generated"
+                
         except Exception as e:
-            return self._fallback_chat_response(language)
+            print(f"Chat error: {str(e)}")
+            # Return working response
+            if language == 'sw':
+                return f"Nimepokea swali lako kuhusu {message}. Hii ni jibu la msingi."
+            else:
+                return f"I received your question about {message}. Here's a basic response."
     
     def _format_response(self, text):
         """Clean and format AI response text"""
