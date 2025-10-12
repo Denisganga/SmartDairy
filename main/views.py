@@ -310,10 +310,10 @@ def analyze_disease_api(request):
                 analysis['veterinary_info'] = {
                     'message': 'Wasiliana na daktari wa wanyamapori haraka!',
                     'emergency_contacts': [
-                        {'name': 'Huduma za Dharura za Wanyamapori', 'phone': '+254-700-123456'},
+                        {'name': 'Daktari wa Wanyamapori - Dr. Mwangi', 'phone': '+254-757-299639'},
+                        {'name': 'Kituo cha Veterinary - Nairobi', 'phone': '+254-115-735292'},
                         {'name': 'Shirikisho la Madaktari wa Wanyamapori Kenya', 'phone': '+254-20-2713378'},
-                        {'name': 'Huduma za Kilimo - Veterinary', 'phone': '+254-711-234567'},
-                        {'name': 'Daktari wa Wanyamapori wa Karibu', 'phone': '+254-722-345678'}
+                        {'name': 'Huduma za Kilimo - Veterinary', 'phone': '+254-711-234567'}
                     ],
                     'advice': 'Usisubiri - piga simu sasa au tembelea kituo cha karibu cha veterinary'
                 }
@@ -321,10 +321,10 @@ def analyze_disease_api(request):
                 analysis['veterinary_info'] = {
                     'message': 'Contact a veterinarian immediately!',
                     'emergency_contacts': [
-                        {'name': 'Emergency Veterinary Services', 'phone': '+254-700-123456'},
+                        {'name': 'Veterinarian - Dr. Mwangi', 'phone': '+254-757-299639'},
+                        {'name': 'Veterinary Clinic - Nairobi', 'phone': '+254-115-735292'},
                         {'name': 'Kenya Veterinary Association', 'phone': '+254-20-2713378'},
-                        {'name': 'Agricultural Services - Veterinary', 'phone': '+254-711-234567'},
-                        {'name': 'Local Veterinary Clinic', 'phone': '+254-722-345678'}
+                        {'name': 'Agricultural Services - Veterinary', 'phone': '+254-711-234567'}
                     ],
                     'advice': 'Do not wait - call now or visit the nearest veterinary clinic'
                 }
